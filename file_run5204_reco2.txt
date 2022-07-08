@@ -1,0 +1,1 @@
+/dune/data2/users/hyliao/protodune/proton/v09_26_00/ana/protodune-sp_runset_5204_reco2/Beam_all.root

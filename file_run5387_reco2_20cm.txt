@@ -1,0 +1,1 @@
+/pnfs/dune/persistent/users/hyliao/protodune/proton/v09_36_00/hr_data_20/ana/beam_all.root

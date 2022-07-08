@@ -1,0 +1,62 @@
+#include "TGraphErrors.h"
+#include "TVector3.h"
+#include <iostream>
+
+#include "TH1.h"
+#include "TH2.h"
+#include "TFile.h"
+
+//Basic config. -----------------------------------------------------//
+std::string fOutputFileName;
+TFile *outputFile;
+void SetOutputFileName(std::string name){fOutputFileName = name;};
+void BookHistograms();
+void SaveHistograms();
+
+//reco sliceID histograms
+//misID:p-rich sample
+TH1D *h_recosliceid_cosLE09;
+TH1D *h_recosliceid_cosLE08;
+TH1D *h_recosliceid_cosLE07;
+TH1D *h_recosliceid_cosGT09;
+
+TH1D *h_cosTheta_Pos[nthinslices+2];
+TH1D *h_cosTheta_Pos_all;
+TH1D *h_cosTheta_Pos_all_nosliceidOne;
+
+void BookHistograms() { //BookHistograms
+	outputFile = TFile::Open(fOutputFileName.c_str(), "recreate"); //open output file
+
+	h_recosliceid_cosLE09 = new TH1D("h_recosliceid_cosLE09","h_recosliceid_cosLE09;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
+	h_recosliceid_cosLE09->Sumw2();
+	h_recosliceid_cosLE08 = new TH1D("h_recosliceid_cosLE08","h_recosliceid_cosLE08;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
+	h_recosliceid_cosLE08->Sumw2();
+	h_recosliceid_cosLE07 = new TH1D("h_recosliceid_cosLE07","h_recosliceid_cosLE07;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
+	h_recosliceid_cosLE07->Sumw2();
+
+	h_recosliceid_cosGT09 = new TH1D("h_recosliceid_cosGT09","h_recosliceid_cosGT09;Reco SliceID", nthinslices + 2, -1, nthinslices + 1);
+	h_recosliceid_cosGT09->Sumw2();
+
+        //cosTheta dists.
+        int n_cosine=100;
+        double cosine_min=0;
+        double cosine_max=1.0;
+        for (int i=0; i<nthinslices+2; ++i) {
+                h_cosTheta_Pos[i]=new TH1D(Form("h_cosTheta_Pos_recosliceid_%d", i-1), Form("Pos; Reco SliceID %d",i-1), n_cosine, cosine_min, cosine_max);
+                h_cosTheta_Pos[i]->Sumw2();
+        }
+        h_cosTheta_Pos_all=new TH1D("h_cosTheta_Pos_all","h_cosTheta_Pos_all", n_cosine, cosine_min, cosine_max);
+        h_cosTheta_Pos_all->Sumw2();
+        h_cosTheta_Pos_all_nosliceidOne=new TH1D("h_cosTheta_Pos_all_nosliceidOne","h_cosTheta_Pos_all_nosliceidOne",n_cosine, cosine_min, cosine_max);
+        h_cosTheta_Pos_all_nosliceidOne->Sumw2();
+     
+} //BookHistograms
+
+
+void SaveHistograms() { //SaveHistograms
+	outputFile->cd();
+	outputFile->Write();
+
+} //SaveHistograms
+
+
