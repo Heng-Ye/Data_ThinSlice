@@ -54,7 +54,7 @@
 using namespace std;
 using namespace ROOT::Math;
 
-void ProtonMomentumReweight_run5387::Loop(TString fout) {
+void ProtonMomentumReweight_run5387::Loop(TString str_fout) {
 	if (fChain == 0) return;
 	Long64_t nentries = fChain->GetEntries();
 	std::cout<<"nentries: "<<nentries<<std::endl;
@@ -584,7 +584,7 @@ void ProtonMomentumReweight_run5387::Loop(TString fout) {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
-		TFile *fout = new TFile(Form("%s",fout.Data()),"RECREATE");
+		TFile *fout = new TFile(Form("%s",str_fout.Data()),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 
 		h2d_rr_dedx_recoSTOP->Write();
