@@ -54,7 +54,7 @@
 using namespace std;
 using namespace ROOT::Math;
 
-void ProtonMomentumReweight_run5387::Loop() {
+void ProtonMomentumReweight_run5387::Loop(TString fout) {
 	if (fChain == 0) return;
 	Long64_t nentries = fChain->GetEntries();
 	std::cout<<"nentries: "<<nentries<<std::endl;
@@ -407,18 +407,18 @@ void ProtonMomentumReweight_run5387::Loop() {
 				yst_nosce=primtrk_starty->at(0);
 				zst_nosce=primtrk_startz->at(0);
 
-				xend_nosce=primtrk_startx->at(-1+primtrk_startx->size());
-				yend_nosce=primtrk_starty->at(-1+primtrk_starty->size());
-				zend_nosce=primtrk_startz->at(-1+primtrk_startz->size());
+				xend_nosce=primtrk_endx->at(-1+primtrk_startx->size());
+				yend_nosce=primtrk_endy->at(-1+primtrk_starty->size());
+				zend_nosce=primtrk_endz->at(-1+primtrk_startz->size());
 			} //check if Pandora flip the sign
 			else {
 				xst_nosce=primtrk_startx->at(-1+primtrk_startx->size());
 				yst_nosce=primtrk_starty->at(-1+primtrk_starty->size());
 				zst_nosce=primtrk_startz->at(-1+primtrk_startz->size());
 
-				xend_nosce=primtrk_startx->at(0);
-				yend_nosce=primtrk_starty->at(0);
-				zend_nosce=primtrk_startz->at(0);
+				xend_nosce=primtrk_endx->at(0);
+				yend_nosce=primtrk_endy->at(0);
+				zend_nosce=primtrk_endz->at(0);
 			}
 		} //if calo size not empty
 		if ((pow(((xst_nosce-mean_x)/dev_x),2)+pow(((yst_nosce-mean_y)/dev_y),2))<=1.) IsXY=true;
@@ -583,7 +583,8 @@ void ProtonMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw.root"),"RECREATE");
-		TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
+		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
+		TFile *fout = new TFile(Form("%s",fout.Data()),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 
 		h2d_rr_dedx_recoSTOP->Write();
