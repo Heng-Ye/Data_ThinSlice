@@ -156,16 +156,16 @@ void ProtonMomentumReweight_run5387::Loop() {
 	TH2D *h2d_xy_SCE=new TH2D("h2d_xy_SCE","", 70,-60,10,60,390,450); //after sce
 
 	//z-st
-	TH1D *h1d_zst_noSCE=new TH1D("h1d_zst_noSCE","",110,-10,100);
-	TH1D *h1d_zst_SCE=new TH1D("h1d_zst_SCE","",110,-10,100);
+	TH1D *h1d_zst_noSCE_stop=new TH1D("h1d_zst_noSCE_stop","",220,-10,100);
+	TH1D *h1d_zst_stop=new TH1D("h1d_zst_stop","",220,-10,100);
 
 	//zend
-	int dz=350;
+	int dz=500;
 	float z_st=-100;
 	float z_end=150;
-	TH1D *h1d_zend = new TH1D("h1d_zend", "reco+BQ", dz, z_st, z_end);
-	TH1D *h1d_zend_noSCE=new TH1D("h1d_zend_noSCE","",110,-10,100);
-	TH1D *h1d_zend_XY = new TH1D("h1d_zend_XY", "reco+BQ+XY", dz, z_st, z_end);	
+	TH1D *h1d_zend_stop = new TH1D("h1d_zend_stop", "", dz, z_st, z_end);
+	TH1D *h1d_zend_noSCE_stop=new TH1D("h1d_zend_noSCE_stop","",110,-10,100);
+	//TH1D *h1d_zend_XY = new TH1D("h1d_zend_XY", "reco+BQ+XY", dz, z_st, z_end);	
 
 	//median dedx
 	TH1D *h1d_mediandedx_BQ=new TH1D("h1d_mediandedx_BQ","",100,0,10);
@@ -435,8 +435,6 @@ void ProtonMomentumReweight_run5387::Loop() {
 		if (IsBeamMom&&IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
 
 			h2d_xy_noSCE->Fill(xst_nosce, yst_nosce);
-			h1d_zst_noSCE->Fill(zst_nosce);
-			h1d_zend_noSCE->Fill(zend_nosce);
 
 			//start(x,y,z) after SCE corr. ----------------------------------------------------------------------------//
 			if ((primtrk_hitz->at(-1+primtrk_hitz->size()))>(primtrk_hitz->at(0))) { //check if Pandora flip the sign
@@ -458,7 +456,6 @@ void ProtonMomentumReweight_run5387::Loop() {
 				zend_sce=primtrk_hitz->at(0);
 			}
 			h2d_xy_SCE->Fill(xst_sce,yst_sce);
-			h1d_zst_SCE->Fill(zst_sce);
 
 			//calo info --------------------------------------------------------------------------//
 			vector<double> trkdedx; //dedx 
@@ -518,12 +515,16 @@ void ProtonMomentumReweight_run5387::Loop() {
 			h1d_kebeam->Fill(ke_beam_MeV);
 			h1d_pbeam->Fill(1000.*p_beam);		
 
-			h1d_trklen_BQ->Fill(range_reco);
-			h1d_zend->Fill(zend_sce);
+			h1d_zst_noSCE_stop->Fill(zst_nosce);
+			h1d_zst_stop->Fill(zst_sce);
 
+			h1d_zend_noSCE_stop->Fill(zend_nosce);
+			h1d_zend_stop->Fill(zend_sce);
+
+			h1d_trklen_BQ->Fill(range_reco);
 			if (IsXY) { 
 				h1d_trklen_XY->Fill(range_reco);
-				h1d_zend_XY->Fill(zend_sce);
+				//h1d_zend_XY->Fill(zend_sce);
 			}
 
 			if (IsRecoStop) {
@@ -620,12 +621,12 @@ void ProtonMomentumReweight_run5387::Loop() {
 		h2d_xy_noSCE->Write();
 		h2d_xy_SCE->Write();
 
-		h1d_zst_noSCE->Write();
-		h1d_zst_SCE->Write();
+		h1d_zst_noSCE_stop->Write();
+		h1d_zst_stop->Write();
 
-		h1d_zend_noSCE->Write();
-		h1d_zend->Write();
-		h1d_zend_XY->Write();
+		h1d_zend_noSCE_stop->Write();
+		h1d_zend_stop->Write();
+		//h1d_zend_XY->Write();
 
 		chi2pid_recostop->Write();
 		chi2pid_recoinel->Write();
