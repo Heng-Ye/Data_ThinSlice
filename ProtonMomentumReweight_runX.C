@@ -180,7 +180,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 	double t_max=336; 
 	TH2D *h2d_time_pcalo_stop=new TH2D("h2d_time_pcalo_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
 	TH2D *h2d_time_prange_stop=new TH2D("h2d_time_prange_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
-	TH2D *h2d_time_pcaloOverprange_stop=new TH2D("h2d_time_pcaloOverprange_stop","",nx,xmin,xmax,1000,-50,50); //x in min
+	TH2D *h2d_time_pcaloOverprange_stop=new TH2D("h2d_time_pcaloOverprange_stop","",n_t,t_min,t_max,40000,-20,20); //x in min
 	TH2D *h2d_time_zst_stop=new TH2D("h2d_time_zst_stop","",n_t,t_min,t_max,220,-10,100); //x in min
 	TH2D *h2d_time_zst_noSCE_stop=new TH2D("h2d_time_zst_noSCE_stop","",n_t,t_min,t_max,220,-10,100); //x in min
 

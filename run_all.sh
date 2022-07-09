@@ -47,7 +47,7 @@ do
     tmp_class_code=$class_name$run"_tmp.C"
 
     g++ makeproton_ana.cc `root-config --libs --cflags` -o $ana_name
-    ./$ana_name "./file_list/"file_run5387_reco2_new3.txt $selector_name
+    ./$ana_name "./file_list/file_run"${run}"_reco2.txt" $selector_name
     sed '/Init(tree)\;/i if (tree-\>InheritsFrom(\"TChain\")) ((TChain\*)tree)-\>LoadTree(0);' $header_name > $tmp_header_name
     mv $tmp_header_name $header_name
     cp -prv $class_namex".C"  $tmp_class_code
