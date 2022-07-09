@@ -1,35 +1,63 @@
 #!/bin/bash
 
-run[0]=5219
-run[1]=5225
-run[2]=5235
-run[3]=5240
-run[4]=5244
-run[5]=5308
-run[6]=5311
-run[7]=5315
-run[8]=5338
-run[9]=5387
-run[10]=5423
-run[11]=5424
-run[12]=5426
-run[13]=5455
-run[14]=5456
-run[15]=5457
-run[16]=5458
-run[17]=5460
-run[18]=5809
-run[19]=5810
-run[20]=5814
-run[21]=5816
-run[22]=5817
-run[23]=5842
-run[24]=5843
-run[25]=5844
+class_name="ProtonMomentumReweight_run"
+class_namex=$class_name"X"
+echo $class_namex
 
-for item in ${run[*]}
+
+
+RUN[0]=5219
+RUN[1]=5225
+RUN[2]=5235
+RUN[3]=5240
+RUN[4]=5244
+RUN[5]=5308
+RUN[6]=5311
+RUN[7]=5315
+RUN[8]=5338
+RUN[9]=5387
+RUN[10]=5423
+RUN[11]=5424
+RUN[12]=5426
+RUN[13]=5455
+RUN[14]=5456
+RUN[15]=5457
+RUN[16]=5458
+RUN[17]=5460
+RUN[18]=5809
+RUN[19]=5810
+RUN[20]=5814
+RUN[21]=5816
+RUN[22]=5817
+RUN[23]=5842
+RUN[24]=5843
+RUN[25]=5844
+
+for run in ${RUN[*]}
 do
-    printf "   %s\n" $item
+    printf "%s\n" $run
+
+    selector_name=$class_name$run
+    ana_name="makeproton_ana_"$class_name$run
+
+    header_name=$class_name$run".h"
+    tmp_header_name=$class_name${run}"_tmp.h"
+
+    class_code=$class_name${run}".C"
+    tmp_class_code=$class_name$run"_tmp.C"
+
+    g++ makeproton_ana.cc `root-config --libs --cflags` -o $ana_name
+    ./$ana_name "./file_list/"file_run5387_reco2_new3.txt $selector_name
+    sed '/Init(tree)\;/i if (tree-\>InheritsFrom(\"TChain\")) ((TChain\*)tree)-\>LoadTree(0);' $header_name > $tmp_header_name
+    mv $tmp_header_name $header_name
+    cp -prv $class_namex".C"  $tmp_class_code
+    sed 's/5387/'${run}'/g' $tmp_class_code > $class_code
+    rm -f $tmp_class_code
+    root_exe_str="root -b -q 'RunAna.C(\""$selector_name\"")'"
+
+    echo $root_exe_str" ......"
+    eval $root_exe_str
+
 done
 
 

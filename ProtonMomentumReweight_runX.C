@@ -54,7 +54,7 @@
 using namespace std;
 using namespace ROOT::Math;
 
-void ProtonMomentumReweight_run5387::Loop(TString str_fout) {
+void ProtonMomentumReweight_run5387::Loop() {
 	if (fChain == 0) return;
 	Long64_t nentries = fChain->GetEntries();
 	std::cout<<"nentries: "<<nentries<<std::endl;
@@ -161,8 +161,8 @@ void ProtonMomentumReweight_run5387::Loop(TString str_fout) {
 
 	//zend
 	int dz=500;
-	float z_st=-100;
-	float z_end=150;
+	float z_st=0;
+	float z_end=250;
 	TH1D *h1d_zend_stop = new TH1D("h1d_zend_stop", "", dz, z_st, z_end);
 	TH1D *h1d_zend_noSCE_stop=new TH1D("h1d_zend_noSCE_stop","",110,-10,100);
 	//TH1D *h1d_zend_XY = new TH1D("h1d_zend_XY", "reco+BQ+XY", dz, z_st, z_end);	
@@ -173,9 +173,12 @@ void ProtonMomentumReweight_run5387::Loop(TString str_fout) {
 	//Edept/L
 	TH1D *h1d_dEdL_BQ=new TH1D("h1d_dEdL_BQ","",100,0,10);	
 
-	//Time dist. for 
-	TH2D *h2d_time_pcalo_stop=new TH2D("h2d_time_pcalo_stop","",nx,xmin,xmax,10080,0,10080); //x in min
-	TH2D *h2d_time_prange_stop=new TH2D("h2d_time_prange_stop","",nx,xmin,xmax,10080,0,10080); //x in min
+	//Time dist. for
+	int n_t=10080;
+	double t_min=0;
+	double t_max=10080; 
+	TH2D *h2d_time_pcalo_stop=new TH2D("h2d_time_pcalo_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
+	TH2D *h2d_time_prange_stop=new TH2D("h2d_time_prange_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
 	TH2D *h2d_time_pcaloOverprange_stop=new TH2D("h2d_time_pcaloOverprange_stop","",nx,xmin,xmax,1000,-50,50); //x in min
 
 	//Fitted Data Beam Momentum
@@ -431,6 +434,7 @@ void ProtonMomentumReweight_run5387::Loop(TString str_fout) {
 		double xend_sce=0;
 		double yend_sce=0;
 		double zend_sce=0;
+		double d_sce=0;
 		//if (IsBQ&&IsCaloSize&&IsPandoraSlice) { //if calo size not empty
 		if (IsBeamMom&&IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
 
@@ -456,6 +460,7 @@ void ProtonMomentumReweight_run5387::Loop(TString str_fout) {
 				zend_sce=primtrk_hitz->at(0);
 			}
 			h2d_xy_SCE->Fill(xst_sce,yst_sce);
+			d_sce=sqrt(pow(xst_sce-xend_sce,2)+pow(yst_sce-yend_sce,2)+pow(zst_sce-zend_sce,2));
 
 			//calo info --------------------------------------------------------------------------//
 			vector<double> trkdedx; //dedx 
@@ -575,6 +580,15 @@ void ProtonMomentumReweight_run5387::Loop(TString str_fout) {
 		TF1* pbeam_fit;  pbeam_fit=VFit(h1d_pbeam, 1); 	 pbeam_fit->SetName("pbeam_fit");
 		TF1* pbeam_stop_fit;  pbeam_stop_fit=VFit(h1d_pbeam_stop, 1); 	 pbeam_stop_fit->SetName("pbeam_stop_fit");
 
+		//time info ---------------------------------------------------//
+        	TParameter<Double_t>* T0=new TParameter<Double_t>("T0",0.);
+        	T0->SetVal(t0);
+        	TParameter<Double_t>* Tmax=new TParameter<Double_t>("Tmax",0.);
+        	Tmax->SetVal(tmax);
+        	TParameter<Double_t>* Tmed=new TParameter<Double_t>("Tmed",0.);
+        	Tmed->SetVal(t0+0.5*(tmax-t0));
+
+
 		//save results...
 		//TFile *fout = new TFile(Form("data_proton_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_tightxy_bmrw.root"),"RECREATE");
@@ -584,8 +598,11 @@ void ProtonMomentumReweight_run5387::Loop(TString str_fout) {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
-		TFile *fout = new TFile(Form("%s",str_fout.Data()),"RECREATE");
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
+		T0->Write();
+		Tmed->Write();
+		Tmax->Write();
 
 		h2d_rr_dedx_recoSTOP->Write();
 		gr_predict_dedx_resrange->Write();
