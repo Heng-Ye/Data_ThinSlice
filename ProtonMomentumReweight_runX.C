@@ -101,6 +101,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 	//int n_b=150;
 	double b_min=0;
 	double b_max=150;
+	TH1D *h1d_dist_stop=new TH1D(Form("h1d_dist_stop"),Form("reco stop"),n_b,b_min,b_max);
 	TH1D *h1d_trklen_stop=new TH1D(Form("h1d_trklen_stop"),Form("reco stop"),n_b,b_min,b_max);
 	TH1D *h1d_trklen_stop_XY=new TH1D(Form("h1d_trklen_stop_XY"),Form("reco stop with xy cut"),n_b,b_min,b_max);
 	TH1D *h1d_trklen_XY=new TH1D(Form("h1d_trklen_XY"),Form("reco"),n_b,b_min,b_max);
@@ -180,6 +181,8 @@ void ProtonMomentumReweight_run5387::Loop() {
 	TH2D *h2d_time_pcalo_stop=new TH2D("h2d_time_pcalo_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
 	TH2D *h2d_time_prange_stop=new TH2D("h2d_time_prange_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
 	TH2D *h2d_time_pcaloOverprange_stop=new TH2D("h2d_time_pcaloOverprange_stop","",nx,xmin,xmax,1000,-50,50); //x in min
+	TH2D *h2d_time_zst_stop=new TH2D("h2d_time_zst_stop","",n_t,t_min,t_max,220,-10,100); //x in min
+	TH2D *h2d_time_zst_noSCE_stop=new TH2D("h2d_time_zst_noSCE_stop","",n_t,t_min,t_max,220,-10,100); //x in min
 
 	//Fitted Data Beam Momentum
 	double m1=1013.71; //Data prod4 reco2
@@ -520,12 +523,6 @@ void ProtonMomentumReweight_run5387::Loop() {
 			h1d_kebeam->Fill(ke_beam_MeV);
 			h1d_pbeam->Fill(1000.*p_beam);		
 
-			h1d_zst_noSCE_stop->Fill(zst_nosce);
-			h1d_zst_stop->Fill(zst_sce);
-
-			h1d_zend_noSCE_stop->Fill(zend_nosce);
-			h1d_zend_stop->Fill(zend_sce);
-
 			h1d_trklen_BQ->Fill(range_reco);
 			if (IsXY) { 
 				h1d_trklen_XY->Fill(range_reco);
@@ -533,9 +530,18 @@ void ProtonMomentumReweight_run5387::Loop() {
 			}
 
 			if (IsRecoStop) {
+				h1d_zst_noSCE_stop->Fill(zst_nosce);
+				h1d_zst_stop->Fill(zst_sce);
+				h2d_time_zst_stop->Fill(evttime-t0,zst_sce);
+				h2d_time_zst_noSCE_stop->Fill(evttime-t0,zst_nosce);
+
+				h1d_zend_noSCE_stop->Fill(zend_nosce);
+				h1d_zend_stop->Fill(zend_sce);
+
 				h1d_kebeam_stop->Fill(ke_beam_MeV);
 				h1d_pbeam_stop->Fill(1000.*p_beam);
 
+				h1d_dist_stop->Fill(d_sce);
 				h1d_trklen_stop->Fill(range_reco);
 				h1d_kerange_stop->Fill(ke_range_MeV);
 				h1d_kecalo_stop->Fill(ke_calo_MeV);
@@ -631,6 +637,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 		h1d_trklen_CaloSz_ElRich->Write();
 		h1d_trklen_Pos_ElRich->Write();
 
+		h1d_dist_stop->Write();
 		h1d_trklen_XY->Write();
 		h1d_trklen_stop->Write();
 		h1d_trklen_stop_XY->Write();
@@ -641,6 +648,8 @@ void ProtonMomentumReweight_run5387::Loop() {
 
 		h1d_zst_noSCE_stop->Write();
 		h1d_zst_stop->Write();
+		h2d_time_zst_stop->Write();
+		h2d_time_zst_noSCE_stop->Write();
 
 		h1d_zend_noSCE_stop->Write();
 		h1d_zend_stop->Write();
