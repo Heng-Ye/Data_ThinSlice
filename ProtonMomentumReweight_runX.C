@@ -175,9 +175,9 @@ void ProtonMomentumReweight_run5387::Loop() {
 	TH1D *h1d_dEdL_BQ=new TH1D("h1d_dEdL_BQ","",100,0,10);	
 
 	//Time dist. for
-	int n_t=20160;
+	int n_t=336;
 	double t_min=0;
-	double t_max=20160; 
+	double t_max=336; 
 	TH2D *h2d_time_pcalo_stop=new TH2D("h2d_time_pcalo_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
 	TH2D *h2d_time_prange_stop=new TH2D("h2d_time_prange_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
 	TH2D *h2d_time_pcaloOverprange_stop=new TH2D("h2d_time_pcaloOverprange_stop","",nx,xmin,xmax,1000,-50,50); //x in min
@@ -532,8 +532,10 @@ void ProtonMomentumReweight_run5387::Loop() {
 			if (IsRecoStop) {
 				h1d_zst_noSCE_stop->Fill(zst_nosce);
 				h1d_zst_stop->Fill(zst_sce);
-				h2d_time_zst_stop->Fill(evttime-t0,zst_sce);
-				h2d_time_zst_noSCE_stop->Fill(evttime-t0,zst_nosce);
+
+				double DT=(evttime-t0)/(60.*60.); //in hour
+				h2d_time_zst_stop->Fill(DT,zst_sce);
+				h2d_time_zst_noSCE_stop->Fill(DT,zst_nosce);
 
 				h1d_zend_noSCE_stop->Fill(zend_nosce);
 				h1d_zend_stop->Fill(zend_sce);
@@ -553,9 +555,9 @@ void ProtonMomentumReweight_run5387::Loop() {
 				h1d_prange_stop->Fill(tmp_prange);
 				h1d_pcalo_stop->Fill(tmp_pcalo);
 
-				h2d_time_pcalo_stop->Fill(evttime-t0,tmp_pcalo);
-				h2d_time_prange_stop->Fill(evttime-t0,tmp_prange);
-				h2d_time_pcaloOverprange_stop->Fill(evttime-t0,tmp_ratio);
+				h2d_time_pcalo_stop->Fill(DT,tmp_pcalo);
+				h2d_time_prange_stop->Fill(DT,tmp_prange);
+				h2d_time_pcaloOverprange_stop->Fill(DT,tmp_ratio);
 
 				if (IsXY) h1d_trklen_stop_XY->Fill(range_reco);
 
