@@ -1,1 +1,0 @@
-root://fndca1.fnal.gov/pnfs/fnal.gov/usr/dune/persistent/users/hyliao/protodune/proton/v09_39_01/run_5816/beam_all.root
