@@ -81,6 +81,10 @@ void plot_time_vs_Varables() {
 	vector<double> t0;
 	vector<double> tmed;
 	vector<double> tmax;
+	vector<double> zero(n,0.);
+	vector<double> ex;
+	char *run_label[n];
+
 	vector<std::string> str_evt_time;
 
 
@@ -106,13 +110,9 @@ void plot_time_vs_Varables() {
 	TH2D **h2d_time_zst_stop=new TH2D*[n];
 	TH2D **h2d_time_zst_noSCE_stop=new TH2D*[n];
 
-	TCanvas *c1=new TCanvas("c1","", 1200, 900);
-	TCanvas *c2=new TCanvas("c2","", 1200, 900);
-	TCanvas *c3=new TCanvas("c3","", 1200, 900);
+	TCanvas *c1=new TCanvas("c1","", 1200, 1800);
 
-	c1->Divide(1,1);
-	c2->Divide(1,1);
-	c3->Divide(1,1);
+	c1->Divide(1,3);
 	//c1->cd(1)->SetLogy();
 	TH2D *f2d_time_ratio=new TH2D("f2d_time_ratio","",17,0,17,10,0.8,1.3);
 	TH2D *f2d_time_prange=new TH2D("f2d_time_prange","",17,0,17,100,0,1800);
@@ -128,17 +128,17 @@ void plot_time_vs_Varables() {
 	c1->cd(1);
 	f2d_time_ratio->Draw();
 
-	c2->cd(1);
+	c1->cd(2);
 	f2d_time_prange->Draw();
 
-	c3->cd(1);
+	c1->cd(3);
 	f2d_time_pcalo->Draw();
 
 
 	for (int i=0; i<n; ++i) {
 		//int i=9;
 		TString str_name;
-		str_name=Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",RUN.at(i));
+		str_name=Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy_old/proton_beamxy_beammom_run%d.root",RUN.at(i));
 		std::cout<<"Processing data:  "<<str_name.Data()<<std::endl;
 
 		file[i]=new TFile(str_name.Data());
@@ -211,6 +211,8 @@ void plot_time_vs_Varables() {
 		fit_zst_noSCE_stop[i]->SetLineStyle(2);
 		fit_zst_noSCE_stop[i]->Draw("same");
 
+		mu_zst_noSCE_stop.push_back(fit_zst_noSCE_stop[i]->GetParameter(0));
+		sigma_zst_noSCE_stop.push_back(fit_zst_noSCE_stop[i]->GetParameter(1));
 
 
 
@@ -223,23 +225,89 @@ void plot_time_vs_Varables() {
 		h2d_time_pcaloOverprange_stop[i]->SetMarkerSize(0.2);
 		h2d_time_pcaloOverprange_stop[i]->Draw("same");
 
-		c2->cd(1);
+		c1->cd(2);
 		h2d_time_prange_stop[i]->SetMarkerSize(0.2);
 		h2d_time_prange_stop[i]->SetMarkerColor(2);
 		h2d_time_prange_stop[i]->Draw("same");
 
-		c3->cd(1);
+		c1->cd(3);
 		h2d_time_pcalo_stop[i]->SetMarkerSize(0.2);
 		h2d_time_pcalo_stop[i]->SetMarkerColor(2);
 		h2d_time_pcalo_stop[i]->Draw("same");
 
 
-		TH1D *f2d_time_zst_stop=new TH1D("f2d_time_zst_stop","",50,-10,40);
+		//TH1D *f2d_time_zst_stop=new TH1D("f2d_time_zst_stop","",50,-10,40);
 
 	}
-	vector<std::string> substr_evt_time(str_evt_time.begin(), str_evt_time.begin() + 6);
+	c1->Print(Form("time_vs_Ps.eps"));
 
 
+	//vector<std::string> substr_evt_time(str_evt_time.begin(), str_evt_time.begin() + 6);
+	TGraphErrors *t_zst_stop=new TGraphErrors(tmed.size(),&tmed.at(0),&mu_zst_stop.at(0),&zero.at(0),&sigma_zst_stop.at(0));
+	TGraphErrors *t_zst_noSCE_stop=new TGraphErrors(tmed.size(),&tmed.at(0),&mu_zst_noSCE_stop.at(0),&zero.at(0),&sigma_zst_noSCE_stop.at(0));
+	auto av_zst_stop=accumulate(mu_zst_stop.begin(), mu_zst_stop.end(), 0.0)/mu_zst_stop.size();
+	auto av_zst_noSCE_stop=accumulate(mu_zst_noSCE_stop.begin(), mu_zst_noSCE_stop.end(), 0.0)/mu_zst_noSCE_stop.size();
+
+	TCanvas *c_time_zst=new TCanvas("c_time_zst"," ",1200, 900);
+	c_time_zst->Divide(1,2);
+	t_zst_stop->GetXaxis()->SetTimeDisplay(1);
+	t_zst_noSCE_stop->GetXaxis()->SetTimeDisplay(1);
+	//t_zst_stop->GetXaxis()->SetTimeFormat("#splitline{%y/%m/%d}{%H:%M}");
+	t_zst_stop->GetXaxis()->SetTimeFormat("%b/%d");
+	t_zst_noSCE_stop->GetXaxis()->SetTimeFormat("%b/%d");
+	t_zst_stop->GetXaxis()->SetTimeOffset(0,"gmt");
+	t_zst_noSCE_stop->GetXaxis()->SetTimeOffset(0,"gmt");
+
+	c_time_zst->cd(1);
+	t_zst_noSCE_stop->SetTitle(Form("No SCE Correction; Time; Z Position [cm]"));
+	t_zst_noSCE_stop->Draw("ap| ");
+	t_zst_noSCE_stop->Draw("p ");
+	cout<<"av_zst_noSCE_stop:"<<av_zst_noSCE_stop<<endl;
+	TLine *l_av_zst_noSCE_stop=new TLine(tmed.at(0), av_zst_noSCE_stop, tmed.at(-1+tmed.size()), av_zst_noSCE_stop);
+	l_av_zst_noSCE_stop->SetLineColor(2);
+	l_av_zst_noSCE_stop->SetLineStyle(2);
+	l_av_zst_noSCE_stop->Draw("");
+	
+	for (Int_t i=0;i<n;i++) {
+		float y_txt_noSCE_stop=.5+mu_zst_noSCE_stop.at(i);
+		cout<<"tmed:"<<tmed.at(i)<<" y_txt_noSCE_stop:"<<y_txt_noSCE_stop<<endl;
+		txt_zst_noSCE_stop[i]=new TText(tmed.at(i),y_txt_noSCE_stop,Form("run%d",RUN[i]));
+		//txt_zst_noSCE_stop[i]->SetTextSize(2);
+		txt_zst_noSCE_stop[i]->SetTextAngle(45);
+		txt_zst_noSCE_stop[i]->SetTextAlign(22);
+		txt_zst_noSCE_stop[i]->SetTextColor(4);
+		txt_zst_noSCE_stop[i]->SetTextFont(43);
+		////txt_zst_noSCE_stop[i]->GetXaxis()->SetTimeDisplay(1);
+		txt_zst_noSCE_stop[i]->Draw("");
+	}
+
+
+	c_time_zst->cd(2);
+	t_zst_stop->SetTitle(Form("With SCE Correction; Time; Z Position [cm]"));
+	t_zst_stop->Draw("ap| ");
+	t_zst_stop->Draw("p ");
+	cout<<"av_zst_stop:"<<av_zst_stop<<endl;
+	TLine *l_av_zst_stop=new TLine(tmed.at(0), av_zst_stop, tmed.at(-1+tmed.size()), av_zst_stop);
+	l_av_zst_stop->SetLineColor(2);
+	l_av_zst_stop->SetLineStyle(2);
+	l_av_zst_stop->Draw("");
+
+	c_time_zst->Print("time_zst.eps");
+
+
+
+	// Vertical alignment.
+	//auto 
+	//auto *tv1 = new TText(0.66,0.165,"Bottom adjusted");
+	//tv1->SetTextAlign(11); tv1->SetTextSize(0.12);
+	//tv1->Draw();
+
+	// Draw labels on the y axis
+	//TText *t = new TText();
+	//t->SetTextAlign(32);
+	//t->SetTextSize(0.035);
+	//t->SetTextFont(72);
+	//char *labels[6] = {"Jan98","Feb98","Mar98","Apr98","May98","Jun98"};
 	//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
 
 
