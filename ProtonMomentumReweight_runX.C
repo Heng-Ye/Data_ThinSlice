@@ -44,7 +44,7 @@
 #include <Math/Vector3D.h>
 #include <Fit/Fitter.h>
 
-#include "./cali/dedx_function_r5387.h"
+//#include "./cali/dedx_function_r5387.h"
 #include "./headers/BasicParameters.h"
 #include "./headers/BasicAnaFunc.h"
 #include "./headers/util.h"
@@ -175,14 +175,14 @@ void ProtonMomentumReweight_run5387::Loop() {
 	TH1D *h1d_dEdL_BQ=new TH1D("h1d_dEdL_BQ","",100,0,10);	
 
 	//Time dist. for
-	int n_t=336;
+	int n_t=24*60;
 	double t_min=0;
-	double t_max=336; 
+	double t_max=24; 
 	TH2D *h2d_time_pcalo_stop=new TH2D("h2d_time_pcalo_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
 	TH2D *h2d_time_prange_stop=new TH2D("h2d_time_prange_stop","",n_t,t_min,t_max,nx,xmin,xmax); //x in min
-	TH2D *h2d_time_pcaloOverprange_stop=new TH2D("h2d_time_pcaloOverprange_stop","",n_t,t_min,t_max,40000,-20,20); //x in min
+	TH2D *h2d_time_pcaloOverprange_stop=new TH2D("h2d_time_pcaloOverprange_stop","",n_t,t_min,t_max, 25000,-5,20); //x in min
 	TH2D *h2d_time_zst_stop=new TH2D("h2d_time_zst_stop","",n_t,t_min,t_max,220,-10,100); //x in min
-	TH2D *h2d_time_zst_noSCE_stop=new TH2D("h2d_time_zst_noSCE_stop","",n_t,t_min,t_max,220,-10,100); //x in min
+	TH2D *h2d_time_zst_noSCE_stop=new TH2D("h2d_time_zst_noSCE_stop","",n_t,t_min,t_max,1100,-10,100); //x in min
 
 	//Fitted Data Beam Momentum
 	double m1=1013.71; //Data prod4 reco2
