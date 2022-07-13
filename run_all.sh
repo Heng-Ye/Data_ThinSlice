@@ -1,9 +1,9 @@
 #!/bin/bash
 
-class_name="ProtonMomentumReweight_run"
+#class_name="ProtonMomentumReweight_run"
+class_name="ProtonBasicCuts_run"
 class_namex=$class_name"X"
 echo $class_namex
-
 
 
 RUN[0]=5219
