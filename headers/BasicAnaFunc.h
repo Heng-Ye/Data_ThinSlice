@@ -110,6 +110,47 @@ TF1* VFit(TH1D* h, Int_t col) {
 	return g;
 }
 
+TF1* VNFit(TH1D* h, float pre_mean, float n_sigma) {
+	//pre-fit parameters
+	//float pre_mean=h->GetBinCenter(h->GetMaximumBin());
+	float pre_max=h->GetMaximum();
+	float pre_rms=h->GetRMS();
+	cout<<"mean: "<<pre_mean<<endl;
+	cout<<"rms: "<<pre_rms<<endl;
+	cout<<"max: "<<pre_max<<endl;
+	cout<<""<<endl;
+
+	//1st fitting
+	TF1 *gg=new TF1("gg",fitg,pre_mean-n_sigma*pre_rms,pre_mean+n_sigma*pre_rms,3);
+	gg->SetParameter(0,pre_mean);
+	gg->SetParameter(1,pre_rms);
+	gg->SetParameter(2,pre_max);
+	//if (pre_rms>1.0e+06) { gg->SetParLimits(1,0,100); }
+
+	//gg->SetLineColor(col);
+	gg->SetLineStyle(2);
+	h->Fit("gg","remn");
+
+	//2nd fitting
+	TF1 *g=new TF1("g",fitg,gg->GetParameter(0)-n_sigma*gg->GetParameter(1),gg->GetParameter(0)+n_sigma*gg->GetParameter(1),3);
+	//TF1 *g=new TF1("g",fitg,gg->GetParameter(0)-1,gg->GetParameter(0)+.5,3);
+	g->SetParameter(0,gg->GetParameter(0));
+	g->SetParameter(1,gg->GetParameter(1));
+	g->SetParameter(2,gg->GetParameter(2));
+
+	//g->SetParLimits(0,gg->GetParameter(0)-3*gg->GetParameter(1), gg->GetParameter(0)+3*gg->GetParameter(1));
+	//double sss=gg->GetParameter(1); if (sss<0) sss=-sss;
+	//g->SetParLimits(1,0,5.*sss);
+	//g->SetParLimits(2,0,10.*sqrt(pre_max));
+
+	//g->SetLineColor(col);
+	g->SetLineStyle(2);
+	g->SetLineWidth(2);
+
+	h->Fit("g","remn");
+	return g;
+}
+
 Double_t govg(Double_t* x,Double_t *par) {
 	//g1
 	double m1=par[0];
