@@ -607,9 +607,9 @@ void ProtonBasicCuts_run5387::Loop() {
 
 		} //evt loop
 
-		TF1* kebeam_fit; kebeam_fit=VFit(h1d_kebeam, 1); kebeam_fit->SetName("kebeam_fit");
-		TF1* pbeam_fit;  pbeam_fit=VFit(h1d_pbeam, 1); 	 pbeam_fit->SetName("pbeam_fit");
-		TF1* pbeam_stop_fit;  pbeam_stop_fit=VFit(h1d_pbeam_stop, 1); 	 pbeam_stop_fit->SetName("pbeam_stop_fit");
+		//TF1* kebeam_fit; kebeam_fit=VFit(h1d_kebeam, 1); kebeam_fit->SetName("kebeam_fit");
+		//TF1* pbeam_fit;  pbeam_fit=VFit(h1d_pbeam, 1); 	 pbeam_fit->SetName("pbeam_fit");
+		//TF1* pbeam_stop_fit;  pbeam_stop_fit=VFit(h1d_pbeam_stop, 1); 	 pbeam_stop_fit->SetName("pbeam_stop_fit");
 
 		//time info ---------------------------------------------------//
         	TParameter<Double_t>* T0=new TParameter<Double_t>("T0",0.);
