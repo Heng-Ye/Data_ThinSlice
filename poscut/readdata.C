@@ -55,10 +55,17 @@ void readdata() {
 	sigma_X.push_back(tmp_sigma_X);
         cout << "\n----------------------" << endl;
     }
-    
+   
+    cout<<"\n\n\nint RUN["<<RUN.size()<<"];"<<endl; 
+    cout<<"double mu_Z["<<RUN.size()<<"];"<<endl; 
+    cout<<"double sigma_Z["<<RUN.size()<<"];"<<endl; 
+    cout<<"double mu_Y["<<RUN.size()<<"];"<<endl; 
+    cout<<"double sigma_Y["<<RUN.size()<<"];"<<endl; 
+    cout<<"double mu_X["<<RUN.size()<<"];"<<endl; 
+    cout<<"double sigma_X["<<RUN.size()<<"];"<<endl; 
      	
     for (size_t j=0; j<RUN.size(); ++j) {
-	cout<<"RUN:"<<RUN.at(j)<<" "<<mu_Z.at(j)<<" "<<sigma_Z.at(j)<<" "<<mu_Y.at(j)<<" "<<sigma_Y.at(j)<<" "<<mu_X.at(j)<<" "<<sigma_X.at(j)<<endl;
+	cout<<"RUN["<<j<<"]="<<RUN.at(j)<<"; mu_Z["<<j<<"]="<<mu_Z.at(j)<<"; sigma_Z["<<j<<"]="<<sigma_Z.at(j)<<"; mu_Y["<<j<<"]="<<mu_Y.at(j)<<"; sigma_Y["<<j<<"]="<<sigma_Y.at(j)<<"; mu_X["<<j<<"]="<<mu_X.at(j)<<"; sigma_X["<<j<<"]="<<sigma_X.at(j)<<";"<<endl;
     }
 
 }
