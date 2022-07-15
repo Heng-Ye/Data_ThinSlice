@@ -4,6 +4,8 @@
 #include <stdexcept>      // std::out_of_range
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <string>
 
 #include <TH2.h>
 #include <TStyle.h>
@@ -18,9 +20,6 @@
 #include <TH2D.h>
 #include <TString.h>
 #include <TProfile2D.h>
-//#include <iostream>
-#include <fstream>
-#include <string>
 #include "TCanvas.h" 
 #include "TGraph.h" 
 #include "TGraphSmooth.h" 
@@ -43,16 +42,24 @@
 #include <TPolyLine3D.h>
 #include <Math/Vector3D.h>
 #include <Fit/Fitter.h>
+#include <cassert>
+
+#include <algorithm>    // copy
+#include <iterator>     // ostream_operator
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/trim.hpp>
+
 
 //#include "./cali/dedx_function_r5387.h"
 #include "./headers/BasicParameters.h"
 #include "./headers/BasicAnaFunc.h"
 #include "./headers/util.h"
 
-#include <cassert>
-
 using namespace std;
+using namespace boost;
 using namespace ROOT::Math;
+
+size_t run_index=0;
 
 void ProtonBasicCuts_run5387::Loop() {
 	if (fChain == 0) return;
@@ -74,6 +81,7 @@ void ProtonBasicCuts_run5387::Loop() {
 		if (evttime>tmax) {
 			tmax=evttime;
 		}
+
 	} //evt loop to get t0
 
 	//summary of total time of data taking --------------//
@@ -85,21 +93,69 @@ void ProtonBasicCuts_run5387::Loop() {
 	//std::cout<<"tot:"<<tot_hr<<" [hrs]"<<std::endl;
 	//-------------------------------------------------------------------//
 
+	//Read Position Cut Values ---------------------------------------------------------//
+	string data("./poscut/pos_cut.csv");
+	ifstream in(data.c_str());
+	if (!in.is_open()) cout<<"FILE "<<data.c_str()<<" NOT Found!"<<endl;
+
+	typedef tokenizer< escaped_list_separator<char> > Tokenizer;
+	vector< string > vec;
+	string line;
+	vector<int> RUN;
+	vector<double> mu_Z;
+	vector<double> sigma_Z;
+	vector<double> mu_Y;
+	vector<double> sigma_Y;
+	vector<double> mu_X;
+	vector<double> sigma_X;
+
+	cout<<"Format: run#,mu_Zst,sigma_Zst,mu_Yst,sigma_Yst,mu_Xst,sigma_Xst"<<endl;
+	while (getline(in,line)) {
+		Tokenizer tok(line);
+		vec.assign(tok.begin(),tok.end());
+
+		// vector now contains strings from one row, output to cout here
+		copy(vec.begin(), vec.end(), ostream_iterator<string>(cout, ","));
+		//cout << "\n" << endl;
+		//cout<<stoi(vec[0])<<" "<<stof(vec[1])<<" "<<stof(vec[2])<<endl;
+		RUN.push_back(stoi(vec[0]));
+
+		mu_Z.push_back(stof(vec[1]));
+		double tmp_sigma_Z=stof(vec[2]); if (tmp_sigma_Z<0) tmp_sigma_Z=-tmp_sigma_Z;
+		sigma_Z.push_back(tmp_sigma_Z);
+
+		mu_Y.push_back(stof(vec[3]));
+		double tmp_sigma_Y=stof(vec[4]); if (tmp_sigma_Y<0) tmp_sigma_Y=-tmp_sigma_Y;
+		sigma_Y.push_back(tmp_sigma_Y);
+
+		mu_X.push_back(stof(vec[5])); 
+		double tmp_sigma_X=stof(vec[6]); if (tmp_sigma_X<0) tmp_sigma_X=-tmp_sigma_X;
+		sigma_X.push_back(tmp_sigma_X);
+		cout << "\n----------------------" << endl;
+	}
+
+	//get run index ----------------------------------------------------------------------//
+	//int cnt_est=0;
+	for (size_t ii=0; ii<RUN.size(); ++ii) if (run==RUN.at(ii)) run_index=ii;
+	cout<<"Basic cut is set for Run "<<RUN.at(run_index)<<". Go go go!!!"<<endl;
+
+
+
 	//book histograms ------------------------------------------------------------------------------------------------------//
-        int n_cosine=100;
-        //double cosine_min=0.9;
-        double cosine_min=0;
-        double cosine_max=1.0;
+	int n_cosine=100;
+	//double cosine_min=0.9;
+	double cosine_min=0;
+	double cosine_max=1.0;
 
 	TH1D *reco_startX_sce; 
 	TH1D *reco_startY_sce;
 	TH1D *reco_startZ_sce;
-        reco_startX_sce = new TH1D(Form("reco_startX_sce"), Form("reco_startX_sce"), 100, -80, 20);  reco_startX_sce->Sumw2();
-        reco_startY_sce = new TH1D(Form("reco_startY_sce"), Form("reco_startY_sce"), 100, 350, 500); reco_startY_sce->Sumw2();
-        reco_startZ_sce = new TH1D(Form("reco_startZ_sce"), Form("reco_startZ_sce"), 100, -5, 10);   reco_startZ_sce->Sumw2();
+	reco_startX_sce = new TH1D(Form("reco_startX_sce"), Form("reco_startX_sce"), 100, -80, 20);  reco_startX_sce->Sumw2();
+	reco_startY_sce = new TH1D(Form("reco_startY_sce"), Form("reco_startY_sce"), 100, 350, 500); reco_startY_sce->Sumw2();
+	reco_startZ_sce = new TH1D(Form("reco_startZ_sce"), Form("reco_startZ_sce"), 100, -5, 10);   reco_startZ_sce->Sumw2();
 
 	TH1D *reco_cosineTheta;
-        reco_cosineTheta = new TH1D("reco_cosineTheta","", n_cosine, cosine_min, cosine_max);   reco_cosineTheta->Sumw2();
+	reco_cosineTheta = new TH1D("reco_cosineTheta","", n_cosine, cosine_min, cosine_max);   reco_cosineTheta->Sumw2();
 
 	//trklen
 	int n_b=30;
@@ -176,7 +232,7 @@ void ProtonBasicCuts_run5387::Loop() {
 	//TH2D *h2d_time_zst_stop=new TH2D("h2d_time_zst_stop","",n_t,t_min,t_max,220,-10,100); //x in min
 	//TH2D *h2d_time_zst_noSCE_stop=new TH2D("h2d_time_zst_noSCE_stop","",n_t,t_min,t_max,1100,-10,100); //x in min
 
-	
+
 	//up-stream E-loss study
 	float bx_min=-50;
 	float bx_max=-10;
@@ -187,6 +243,19 @@ void ProtonBasicCuts_run5387::Loop() {
 	TH2D *bx_by=new TH2D("bx_by","", n_bx, bx_min, bx_max, n_by, by_min, by_max);
 
 
+	//position cut (x,y,z) ---------------------------------------------------------//
+	double g_min=-10;
+	double g_max=10;
+	int n_g=100;
+	TH1D *h1d_dx = new TH1D("h1d_dx", "", n_g, g_min, g_max);
+	TH1D *h1d_dy = new TH1D("h1d_dy", "", n_g, g_min, g_max);
+	TH1D *h1d_dz = new TH1D("h1d_dz", "", n_g, g_min, g_max);
+	TH1D *h1d_dxy = new TH1D("h1d_dxy", "", n_g, g_min, g_max);
+
+	TH1D *h1d_dx_global = new TH1D("h1d_dx_global", "", n_g, g_min, g_max);
+	TH1D *h1d_dy_global = new TH1D("h1d_dy_global", "", n_g, g_min, g_max);
+	TH1D *h1d_dz_global = new TH1D("h1d_dz_global", "", n_g, g_min, g_max);
+	TH1D *h1d_dxy_global = new TH1D("h1d_dxy_global", "", n_g, g_min, g_max);
 
 	//Fitted Data Beam Momentum
 	double m1=1013.71; //Data prod4 reco2
@@ -195,7 +264,6 @@ void ProtonBasicCuts_run5387::Loop() {
 	//momentum cut range	
 	double mu_min=m1-3.*s1;
 	double mu_max=m1+3.*s1;
-
 
 	Long64_t nbytes = 0, nb = 0;
 	for (Long64_t jentry=0; jentry<nentries;jentry++) { //evt loop
@@ -285,6 +353,21 @@ void ProtonBasicCuts_run5387::Loop() {
 			double beam_dz=(reco_stz-mean_StartZ)/sigma_StartZ;
 			double beam_dxy=sqrt(pow(beam_dx,2)+pow(beam_dy,2));
 
+			Fill1DHist(h1d_dx_global, beam_dx);
+			Fill1DHist(h1d_dy_global, beam_dy);
+			Fill1DHist(h1d_dz_global, beam_dz);
+			Fill1DHist(h1d_dxy_global, beam_dxy);
+
+			double each_beam_dx=(reco_stx-mu_X.at(run_index))/sigma_X.at(run_index); 
+			double each_beam_dy=(reco_sty-mu_Y.at(run_index))/sigma_Y.at(run_index); 
+			double each_beam_dz=(reco_stz-mu_Z.at(run_index))/sigma_Z.at(run_index);
+			double each_beam_dxy=sqrt(pow(each_beam_dx,2)+pow(each_beam_dy,2));
+			
+			Fill1DHist(h1d_dx, each_beam_dx);
+			Fill1DHist(h1d_dy, each_beam_dy);
+			Fill1DHist(h1d_dz, each_beam_dz);
+			Fill1DHist(h1d_dxy, each_beam_dxy);
+
 			if (beam_dx>=dx_min&&beam_dx<=dx_max) { //dx
 				if (beam_dy>=dy_min&&beam_dy<=dy_max) { //dy
 					if (beam_dz>=dz_min&&beam_dz<=dz_max) { //dz
@@ -350,7 +433,7 @@ void ProtonBasicCuts_run5387::Loop() {
 
 
 
-/*
+		/*
 		//Get calo info -----------------------------------------------------------------------------------------------//
 		double range_reco=-99;
 		vector<double> reco_trklen_accum;
@@ -359,39 +442,39 @@ void ProtonBasicCuts_run5387::Loop() {
 		double pid=-99;
 
 		if (IsPandoraSlice&&IsCaloSize) { //if calo size not empty
-			vector<double> trkdedx;
-			vector<double> trkres;
-			for (size_t h=0; h<primtrk_dedx->size(); ++h) { //loop over reco hits in a track
-				double hitx_reco=primtrk_hitx->at(h);
-				double hity_reco=primtrk_hity->at(h);
-				double hitz_reco=primtrk_hitz->at(h);
-				double resrange_reco=primtrk_resrange->at(h);
+		vector<double> trkdedx;
+		vector<double> trkres;
+		for (size_t h=0; h<primtrk_dedx->size(); ++h) { //loop over reco hits in a track
+		double hitx_reco=primtrk_hitx->at(h);
+		double hity_reco=primtrk_hity->at(h);
+		double hitz_reco=primtrk_hitz->at(h);
+		double resrange_reco=primtrk_resrange->at(h);
 
-				double dqdx=primtrk_dqdx->at(h);
-				double dedx=primtrk_dedx->at(h); //prod4-reco 2 has dedx already
-				double pitch=primtrk_pitch->at(h);
+		double dqdx=primtrk_dqdx->at(h);
+		double dedx=primtrk_dedx->at(h); //prod4-reco 2 has dedx already
+		double pitch=primtrk_pitch->at(h);
 
-				int wid_reco=primtrk_wid->at(-1+primtrk_wid->size()-h);
-				double pt_reco=primtrk_pt->at(-1+primtrk_wid->size()-h);
+		int wid_reco=primtrk_wid->at(-1+primtrk_wid->size()-h);
+		double pt_reco=primtrk_pt->at(-1+primtrk_wid->size()-h);
 
-				//double cali_dedx=0.;
-				//cali_dedx=dedx_function_35ms(dqdx, hitx_reco, hity_reco, hitz_reco);
-				EDept.push_back(dedx*pitch);
+		//double cali_dedx=0.;
+		//cali_dedx=dedx_function_35ms(dqdx, hitx_reco, hity_reco, hitz_reco);
+		EDept.push_back(dedx*pitch);
 
-				if (h==1) range_reco=0;
-				if (h>=1) {
-					range_reco += sqrt( pow(primtrk_hitx->at(h)-primtrk_hitx->at(h-1), 2)+
-							pow(primtrk_hity->at(h)-primtrk_hity->at(h-1), 2)+
-							pow(primtrk_hitz->at(h)-primtrk_hitz->at(h-1), 2) );
-					reco_trklen_accum[h] = range_reco;
-				}
+		if (h==1) range_reco=0;
+		if (h>=1) {
+		range_reco += sqrt( pow(primtrk_hitx->at(h)-primtrk_hitx->at(h-1), 2)+
+		pow(primtrk_hity->at(h)-primtrk_hity->at(h-1), 2)+
+		pow(primtrk_hitz->at(h)-primtrk_hitz->at(h-1), 2) );
+		reco_trklen_accum[h] = range_reco;
+		}
 
-				trkdedx.push_back(dedx);
-				trkres.push_back(resrange_reco);
-			} //loop over reco hits in a track
-			//range_reco=primtrk_range->at(0); 
+		trkdedx.push_back(dedx);
+		trkres.push_back(resrange_reco);
+		} //loop over reco hits in a track
+		//range_reco=primtrk_range->at(0); 
 
-			pid=chi2pid(trkdedx,trkres); //pid using stopping proton hypothesis
+		pid=chi2pid(trkdedx,trkres); //pid using stopping proton hypothesis
 
 		} //if calo size not empty	
 
@@ -410,12 +493,12 @@ void ProtonBasicCuts_run5387::Loop() {
 		//if (IsRecoInel&&IsBQ&&IsCaloSize&&IsPandoraSlice) n_recoinel++;
 
 		if ((range_reco/csda_val)<min_norm_trklen_csda) { //inel region
-			if (pid>pid_1) IsRecoInel=true;
-			if (pid<=pid_1) IsRecoStop=true;
+		if (pid>pid_1) IsRecoInel=true;
+		if (pid<=pid_1) IsRecoStop=true;
 		} //inel region
 		if ((range_reco/csda_val)>=min_norm_trklen_csda&&(range_reco/csda_val)<max_norm_trklen_csda) { //stopping p region
-			if (pid>pid_2) IsRecoInel=true;
-			if (pid<=pid_2) IsRecoStop=true;
+		if (pid>pid_2) IsRecoInel=true;
+		if (pid<=pid_2) IsRecoStop=true;
 		} //stopping p region
 
 		//XY Cut ---------------------------------------------------------------------------------------------------------------//
@@ -505,7 +588,7 @@ void ProtonBasicCuts_run5387::Loop() {
 				trkres.push_back(resrange_reco); //vector for pid
 
 				//if (IsRecoStop) { //reco_stop
-					//h2d_rr_dedx_recoSTOP->Fill(resrange_reco, dedx);
+				//h2d_rr_dedx_recoSTOP->Fill(resrange_reco, dedx);
 				//} //reco_stop	
 			} //loop over hits
 
@@ -520,19 +603,19 @@ void ProtonBasicCuts_run5387::Loop() {
 			//Fill1DHist(h1d_dEdL_BQ, ke_calo_MeV/range_reco);			
 
 			//if (IsRecoStop) { //reco_stop
-				//chi2pid_recostop->Fill(pid);
+			//chi2pid_recostop->Fill(pid);
 			//} //reco_stop	
 			//if (IsRecoInel) { //reco_inel
-				//chi2pid_recoinel->Fill(pid);
+			//chi2pid_recoinel->Fill(pid);
 			//} //reco_inel
 		} //if calo size not empty
 
 		//if (IsCaloSize&&IsPandoraSlice) { //CaloSz
-			//h1d_trklen_CaloSz->Fill(range_reco);
+		//h1d_trklen_CaloSz->Fill(range_reco);
 		//} //CaloSz
 
 		//if (IsPos&&IsCaloSize&&IsPandoraSlice) { //Pos
-			//h1d_trklen_Pos->Fill(range_reco);
+		//h1d_trklen_Pos->Fill(range_reco);
 		//} //Pos
 
 
@@ -602,7 +685,7 @@ void ProtonBasicCuts_run5387::Loop() {
 				}
 			}
 		} //calosz
-*/
+		*/
 
 
 		} //evt loop
@@ -612,16 +695,17 @@ void ProtonBasicCuts_run5387::Loop() {
 		//TF1* pbeam_stop_fit;  pbeam_stop_fit=VFit(h1d_pbeam_stop, 1); 	 pbeam_stop_fit->SetName("pbeam_stop_fit");
 
 		//time info ---------------------------------------------------//
-        	TParameter<Double_t>* T0=new TParameter<Double_t>("T0",0.);
-        	T0->SetVal(t0);
-        	TParameter<Double_t>* Tmax=new TParameter<Double_t>("Tmax",0.);
-        	Tmax->SetVal(tmax);
-        	TParameter<Double_t>* Tmed=new TParameter<Double_t>("Tmed",0.);
-        	Tmed->SetVal(t0+0.5*(tmax-t0));
+		TParameter<Double_t>* T0=new TParameter<Double_t>("T0",0.);
+		T0->SetVal(t0);
+		TParameter<Double_t>* Tmax=new TParameter<Double_t>("Tmax",0.);
+		Tmax->SetVal(tmax);
+		TParameter<Double_t>* Tmed=new TParameter<Double_t>("Tmed",0.);
+		Tmed->SetVal(t0+0.5*(tmax-t0));
 
 
 		//save results...
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/Basic_Cuts/proton_basicCuts_run%d.root",run),"RECREATE");
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/Basic_Cuts/proton_basicCuts_run%d.root",run),"RECREATE");
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/Basic_Cuts/proton_ApplybasicCuts_run%d.root",run),"RECREATE");
 		T0->Write();
 		Tmed->Write();
 		Tmax->Write();
@@ -633,6 +717,15 @@ void ProtonBasicCuts_run5387::Loop() {
 		reco_cosineTheta->Write();
 		bx_by->Write();	
 
+		h1d_dx->Write();
+		h1d_dy->Write();
+		h1d_dz->Write();
+		h1d_dxy->Write();
+
+		h1d_dx_global->Write();
+		h1d_dy_global->Write();
+		h1d_dz_global->Write();
+		h1d_dxy_global->Write();
 
 
 
@@ -641,52 +734,50 @@ void ProtonBasicCuts_run5387::Loop() {
 
 
 
+		/*
+		   h2d_rr_dedx_recoSTOP->Write();
+		   gr_predict_dedx_resrange->Write();
+
+		   h1d_pbeam->Write();
+		   h1d_pbeam_stop->Write();
+		   h1d_kebeam->Write();
+		   h1d_kebeam_stop->Write();
+
+		   h1d_prange_stop->Write();
+		   h1d_pcalo_stop->Write();
+
+		   kebeam_fit->Write();
+		   pbeam_fit->Write();
+		   pbeam_stop_fit->Write();
+
+		   h1d_kerange_stop->Write();
+		   h1d_kecalo_stop->Write();
+
+		   h1d_trklen_CaloSz->Write();
+		   h1d_trklen_Pos->Write();
+		   h1d_trklen_BQ->Write();
+		   h1d_trklen_RecoInel->Write();
+		   h1d_trklen_MidpRich->Write();
+		   h1d_trklen_ElRich->Write();
+		   h1d_trklen_CaloSz_ElRich->Write();
+		   h1d_trklen_Pos_ElRich->Write();
+
+		   h1d_dist_stop->Write();
+		   h1d_trklen_XY->Write();
+		   h1d_trklen_stop->Write();
+		   h1d_trklen_stop_XY->Write();
 
 
-/*
-		h2d_rr_dedx_recoSTOP->Write();
-		gr_predict_dedx_resrange->Write();
+		   h2d_xy_noSCE->Write();
+		   h2d_xy_SCE->Write();
 
-		h1d_pbeam->Write();
-		h1d_pbeam_stop->Write();
-		h1d_kebeam->Write();
-		h1d_kebeam_stop->Write();
+		   h1d_zst_noSCE_stop->Write();
+		   h1d_zst_stop->Write();
+		   h2d_time_zst_stop->Write();
+		   h2d_time_zst_noSCE_stop->Write();
 
-		h1d_prange_stop->Write();
-		h1d_pcalo_stop->Write();
-
-		kebeam_fit->Write();
-		pbeam_fit->Write();
-		pbeam_stop_fit->Write();
-
-		h1d_kerange_stop->Write();
-		h1d_kecalo_stop->Write();
-
-		h1d_trklen_CaloSz->Write();
-		h1d_trklen_Pos->Write();
-		h1d_trklen_BQ->Write();
-		h1d_trklen_RecoInel->Write();
-		h1d_trklen_MidpRich->Write();
-		h1d_trklen_ElRich->Write();
-		h1d_trklen_CaloSz_ElRich->Write();
-		h1d_trklen_Pos_ElRich->Write();
-
-		h1d_dist_stop->Write();
-		h1d_trklen_XY->Write();
-		h1d_trklen_stop->Write();
-		h1d_trklen_stop_XY->Write();
-
-
-		h2d_xy_noSCE->Write();
-		h2d_xy_SCE->Write();
-
-		h1d_zst_noSCE_stop->Write();
-		h1d_zst_stop->Write();
-		h2d_time_zst_stop->Write();
-		h2d_time_zst_noSCE_stop->Write();
-
-		h1d_zend_noSCE_stop->Write();
-		h1d_zend_stop->Write();
+		   h1d_zend_noSCE_stop->Write();
+		   h1d_zend_stop->Write();
 		//h1d_zend_XY->Write();
 
 		chi2pid_recostop->Write();
@@ -702,7 +793,7 @@ void ProtonBasicCuts_run5387::Loop() {
 		h2d_time_pcalo_stop->Write();
 		h2d_time_prange_stop->Write();
 		h2d_time_pcaloOverprange_stop->Write();
-*/
+		*/
 
 
 
