@@ -5,7 +5,6 @@ class_name="ProtonBasicCuts_run"
 class_namex=$class_name"X"
 echo $class_namex
 
-
 RUN[0]=5219
 RUN[1]=5225
 RUN[2]=5235

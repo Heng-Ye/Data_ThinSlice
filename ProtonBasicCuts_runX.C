@@ -251,11 +251,19 @@ void ProtonBasicCuts_run5387::Loop() {
 	TH1D *h1d_dy = new TH1D("h1d_dy", "", n_g, g_min, g_max);
 	TH1D *h1d_dz = new TH1D("h1d_dz", "", n_g, g_min, g_max);
 	TH1D *h1d_dxy = new TH1D("h1d_dxy", "", n_g, g_min, g_max);
+	h1d_dx->GetXaxis()->SetTitle("(X-#mu_{X})/#sigma_{X}"); h1d_dx->Sumw2();
+	h1d_dy->GetXaxis()->SetTitle("(Y-#mu_{Y})/#sigma_{Y}"); h1d_dy->Sumw2();
+	h1d_dz->GetXaxis()->SetTitle("(Z-#mu_{Z})/#sigma_{Z}"); h1d_dz->Sumw2();
+	h1d_dxy->Sumw2();
 
 	TH1D *h1d_dx_global = new TH1D("h1d_dx_global", "", n_g, g_min, g_max);
 	TH1D *h1d_dy_global = new TH1D("h1d_dy_global", "", n_g, g_min, g_max);
 	TH1D *h1d_dz_global = new TH1D("h1d_dz_global", "", n_g, g_min, g_max);
 	TH1D *h1d_dxy_global = new TH1D("h1d_dxy_global", "", n_g, g_min, g_max);
+	h1d_dx_global->Sumw2();
+	h1d_dy_global->Sumw2();
+	h1d_dz_global->Sumw2();
+	h1d_dxy_global->Sumw2();
 
 	//Fitted Data Beam Momentum
 	double m1=1013.71; //Data prod4 reco2
