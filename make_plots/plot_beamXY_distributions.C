@@ -97,51 +97,35 @@ void plot_beamXY_distributions() {
 	TH2D *bx_by_all;
 
 
+	vector<double> mu_x;
+	vector<double> rms_x;
 
-	
-/*
-	TF1 **fit_zst=new TF1*[n];
-	TF1 **fit_yst=new TF1*[n];
-	TF1 **fit_xst=new TF1*[n];
+	vector<double> mu_y;
+	vector<double> rms_y;
 
-	vector<double> mu_zst;
-	vector<double> err_mu_zst;
-	vector<double> sigma_zst;
-	vector<double> err_sigma_zst;
-
-	vector<double> mu_yst;
-	vector<double> err_mu_yst;
-	vector<double> sigma_yst;
-	vector<double> err_sigma_yst;
-
-	vector<double> mu_xst;
-	vector<double> err_mu_xst;
-	vector<double> sigma_xst;
-	vector<double> err_sigma_xst;
-*/
 
 	//c1->cd(1)->SetLogy();
 
-/*
-	TH2D *f2d_time_ratio=new TH2D("f2d_time_ratio","",17,0,17,10,0.8,1.3);
-	TH2D *f2d_time_prange=new TH2D("f2d_time_prange","",17,0,17,100,0,1800);
-	TH2D *f2d_time_pcalo=new TH2D("f2d_time_pcalo","",17,0,17,100,0,1800);
+	/*
+	   TH2D *f2d_time_ratio=new TH2D("f2d_time_ratio","",17,0,17,10,0.8,1.3);
+	   TH2D *f2d_time_prange=new TH2D("f2d_time_prange","",17,0,17,100,0,1800);
+	   TH2D *f2d_time_pcalo=new TH2D("f2d_time_pcalo","",17,0,17,100,0,1800);
 
-	f2d_time_ratio->SetTitle("Stopping Protons; Time since Data Taking[hr]; P_{calo}/P_{range}");
-	f2d_time_prange->SetTitle("Stopping Protons; Time since Data Taking[hr]; P_{range} [MeV/c]");
-	f2d_time_pcalo->SetTitle("Stopping Protons; Time since Data Taking[hr]; P_{calo} [MeV/c]");
-	c1->cd(1);
-	f2d_time_ratio->Draw();
-	c1->cd(2);
-	f2d_time_prange->Draw();
-	c1->cd(3);
-	f2d_time_pcalo->Draw();
-*/
+	   f2d_time_ratio->SetTitle("Stopping Protons; Time since Data Taking[hr]; P_{calo}/P_{range}");
+	   f2d_time_prange->SetTitle("Stopping Protons; Time since Data Taking[hr]; P_{range} [MeV/c]");
+	   f2d_time_pcalo->SetTitle("Stopping Protons; Time since Data Taking[hr]; P_{calo} [MeV/c]");
+	   c1->cd(1);
+	   f2d_time_ratio->Draw();
+	   c1->cd(2);
+	   f2d_time_prange->Draw();
+	   c1->cd(3);
+	   f2d_time_pcalo->Draw();
+	   */
 
 
 
-  	//ofstream myfile_output;
-  	//myfile_output.open (Form("./poscut/pos_cut.csv"));
+	//ofstream myfile_output;
+	//myfile_output.open (Form("./poscut/pos_cut.csv"));
 	for (int i=0; i<n; ++i) {
 		//int i=9;
 		//Read data -----------------------------------------------------------------------------------------------------//
@@ -160,10 +144,11 @@ void plot_beamXY_distributions() {
 		f2d_bx_by->GetXaxis()->SetTitle("X [cm]");
 		f2d_bx_by->GetYaxis()->SetTitle("Y [cm]");
 
+
 		TString str_xy;
-		if (i==0) str_xy=Form("./beamxy_all.pdf(");
-		if (i>0&&i<n-1) str_xy=Form("./beamxy_all.pdf");
-		if(i==n-1) str_xy=Form("./beamxy_all.pdf)");
+		if (i==0) str_xy=Form("./beamxy_RunbyRun.pdf(");
+		if (i>0&&i<n-1) str_xy=Form("./beamxy_RunbyRun.pdf");
+		if(i==n-1) str_xy=Form("./beamxy_RunbyRun.pdf)");
 
 		if (i==0) {
 			bx_by_all=(TH2D*)bx_by[i]->Clone();
@@ -208,42 +193,72 @@ void plot_beamXY_distributions() {
 		//TH2D *f2d_yst=new TH2D("f2d_yst","",150,350,500,plot_ymax_y,0,plot_ymax_y*1.1);
 		//TH2D *f2d_xst=new TH2D("f2d_xst","",100,-80,20,plot_ymax_x,0,plot_ymax_x*1.1);
 
-		bx_by_all->SetTitle(Form("Run %d: t_{0}:%s (%.2f hrs); Z [cm]; Counts",RUN.at(i),buf_time, dt));
+		bx_by[i]->SetTitle(Form("Run %d: t_{0}:%s (%.2f hrs); Z [cm]; Counts",RUN.at(i),buf_time, dt));
 		//f2d_yst->SetTitle(Form("; Y [cm]; Counts"));
 		//f2d_xst->SetTitle(Form("; X [cm]; Counts"));
 
+		//gStyle->SetOptStat(1111111);
+		// Set stat options
+		gStyle->SetStatY(0.92);                
+		// Set y-position (fraction of pad size)
+		gStyle->SetStatX(0.92);                
+		// Set x-position (fraction of pad size)
+		gStyle->SetStatW(0.2);                
+		// Set width of stat-box (fraction of pad size)
+		gStyle->SetStatH(0.1);                
+		// Set height of stat-box (fraction of pad size)
 
 		bx_by[i]->GetXaxis()->SetTitle("X [cm]");
 		bx_by[i]->GetYaxis()->SetTitle("Y [cm]");
+		bx_by[i]->GetXaxis()->CenterTitle();
+		bx_by[i]->GetYaxis()->CenterTitle();
 		bx_by[i]->Draw("colz");	
+
+		float meanX_mc=bx_by[i]->GetMean(1);
+		float rmsX_mc=bx_by[i]->GetRMS(1);
+		float meanY_mc=bx_by[i]->GetMean(2);
+		float rmsY_mc=bx_by[i]->GetRMS(2);
+		TEllipse *el_mc = new TEllipse(meanX_mc,meanY_mc,1.5*rmsX_mc,1.5*rmsY_mc);
+		el_mc->SetLineWidth(1);
+		el_mc->SetLineColor(2);
+		el_mc->SetLineStyle(2);
+		el_mc->SetFillStyle(0);
+		el_mc->Draw();
+
+		mu_x.push_back(meanX_mc);
+		rms_x.push_back(rmsX_mc);
+		mu_y.push_back(meanY_mc);
+		rms_y.push_back(rmsY_mc);
+
+
 
 		c_xy->Print(str_xy.Data());
 
 		delete c_xy;
 		delete f2d_bx_by;
+		delete el_mc;
 
 
+		/*
+		   TCanvas *c_zyx_st=new TCanvas("c_zyx_st","", 1200, 1800);
+		   c_zyx_st->Divide(1, 3);
 
-/*
-		TCanvas *c_zyx_st=new TCanvas("c_zyx_st","", 1200, 1800);
-		c_zyx_st->Divide(1, 3);
+		   TString str_zyx_st_out;
+		   if (i==0) str_zyx_st_out=Form("./zyx_st_all.pdf(");
+		   if (i>0&&i<n-1) str_zyx_st_out=Form("./zyx_st_all.pdf");
+		   if(i==n-1) str_zyx_st_out=Form("./zyx_st_all.pdf)");
 
-		TString str_zyx_st_out;
-		if (i==0) str_zyx_st_out=Form("./zyx_st_all.pdf(");
-		if (i>0&&i<n-1) str_zyx_st_out=Form("./zyx_st_all.pdf");
-		if(i==n-1) str_zyx_st_out=Form("./zyx_st_all.pdf)");
-
-		c_zyx_st->cd(1);
-		f2d_zst->Draw();
-		reco_startZ_sce[i]->Draw("same");
-		if (i==10||i==8) fit_zst[i]=VNFit(reco_startZ_sce[i], 4.5, 6);
-		else fit_zst[i]=VNFit(reco_startZ_sce[i], 3.4, 6);
-		fit_zst[i]->SetLineColor(2);
-		fit_zst[i]->SetLineStyle(2);
-		fit_zst[i]->Draw("same");
-		double tmp_mu_zst=fit_zst[i]->GetParameter(0);
-		double tmp_sigma_zst=fit_zst[i]->GetParameter(1);
-		mu_zst.push_back(tmp_mu_zst);
+		   c_zyx_st->cd(1);
+		   f2d_zst->Draw();
+		   reco_startZ_sce[i]->Draw("same");
+		   if (i==10||i==8) fit_zst[i]=VNFit(reco_startZ_sce[i], 4.5, 6);
+		   else fit_zst[i]=VNFit(reco_startZ_sce[i], 3.4, 6);
+		   fit_zst[i]->SetLineColor(2);
+		   fit_zst[i]->SetLineStyle(2);
+		   fit_zst[i]->Draw("same");
+		   double tmp_mu_zst=fit_zst[i]->GetParameter(0);
+		   double tmp_sigma_zst=fit_zst[i]->GetParameter(1);
+		   mu_zst.push_back(tmp_mu_zst);
 		//err_mu_zst.push_back(fit_zst[i]->GetParErrors(0));
 		sigma_zst.push_back(tmp_sigma_zst);
 		//err_sigma_zst.push_back(fit_zst[i]->GetParErrors(1));
@@ -283,77 +298,167 @@ void plot_beamXY_distributions() {
 		delete f2d_yst;
 		delete f2d_xst;
 		delete c_zyx_st;
-*/
+		*/
 
 
 	}
-  	//myfile_output.close();
+	//myfile_output.close();
 
 
-/*
-	TLegend *leg = new TLegend(0.14,0.65,.6,0.85);
-	leg->SetFillStyle(0);
-	leg->AddEntry(h1d_dz_all, "Fit then Sum", "ep");
-	leg->AddEntry(h1d_dz_global_all, "Sum then Fit", "ep");
+	TCanvas *c_xy_all=new TCanvas("c_xy_all","", 600, 600);
+	c_xy_all->Divide(1, 1);
 
-	TCanvas *c1_xyz=new TCanvas("c1_xyz","", 1200, 1800);
-	c1_xyz->Divide(1,4);
+	TH2D *f2d_bx_by_all=new TH2D("f2d_bx_by_all","", 60, -50, -10, 35, 405, 440);
+	f2d_bx_by_all->GetXaxis()->SetTitle("X [cm]");
+	f2d_bx_by_all->GetYaxis()->SetTitle("Y [cm]");
 
-	c1_xyz->cd(1);
-	h1d_dz_all->SetMarkerColor(2);
-	h1d_dz_all->SetLineColor(2);
-	h1d_dz_all->GetXaxis()->SetTitle("#DeltaZ/#sigma_{z}");
-	h1d_dz_all->GetXaxis()->SetTitleOffset(1.1);
-	h1d_dz_all->GetXaxis()->CenterTitle(true);
-	h1d_dz_all->Draw();
-	h1d_dz_global_all->SetLineColor(1);
-	h1d_dz_global_all->SetMarkerColor(1);
-	h1d_dz_global_all->Draw("same");
-	leg->Draw();
-	
-	c1_xyz->cd(2);
-	h1d_dy_all->SetMarkerColor(2);
-	h1d_dy_all->SetLineColor(2);
-	h1d_dy_all->GetXaxis()->SetTitle("#DeltaY/#sigma_{Y}");
-	h1d_dy_all->GetXaxis()->SetTitleOffset(1.1);
-	h1d_dy_all->GetXaxis()->CenterTitle(true);
-	h1d_dy_all->Draw();
-	h1d_dy_global_all->SetLineColor(1);
-	h1d_dy_global_all->SetMarkerColor(1);
-	h1d_dy_global_all->Draw("same");
-	leg->Draw();
+	bx_by_all->GetXaxis()->SetTitle("X [cm]");
+	bx_by_all->GetYaxis()->SetTitle("Y [cm]");
+	bx_by_all->GetXaxis()->CenterTitle();
+	bx_by_all->GetYaxis()->CenterTitle();
+	bx_by_all->Draw("colz");	
 
-	c1_xyz->cd(3);
-	h1d_dx_all->SetMarkerColor(2);
-	h1d_dx_all->SetLineColor(2);
-	h1d_dx_all->GetXaxis()->SetTitle("#DeltaX/#sigma_{X}");
-	h1d_dx_all->GetXaxis()->SetTitleOffset(1.1);
-	h1d_dx_all->GetXaxis()->CenterTitle(true);
-	h1d_dx_all->Draw();
-	h1d_dx_global_all->SetLineColor(1);
-	h1d_dx_global_all->SetMarkerColor(1);
-	h1d_dx_global_all->Draw("same");
-	leg->Draw();
+	float meanX_data_all=bx_by_all->GetMean(1);
+	float rmsX_data_all=bx_by_all->GetRMS(1);
+	float meanY_data_all=bx_by_all->GetMean(2);
+	float rmsY_data_all=bx_by_all->GetRMS(2);
+	cout<<"meanX_data_all:"<<meanX_data_all<<endl;
+	cout<<"rmsX_data_all:"<<rmsX_data_all<<endl;
+	cout<<"meanY_data_all:"<<meanY_data_all<<endl;
+	cout<<"rmsY_data_all:"<<rmsY_data_all<<endl;
+
+	TEllipse *el_data_all = new TEllipse(meanX_data_all,meanY_data_all,1.5*rmsX_data_all,1.5*rmsY_data_all);
+	el_data_all->SetLineWidth(1);
+	el_data_all->SetLineColor(2);
+	el_data_all->SetLineStyle(2);
+	el_data_all->SetFillStyle(0);
+	el_data_all->Draw();
+
+	c_xy_all->Print("beamXY_all.eps");
 
 
-	c1_xyz->cd(4);
-	h1d_dxy_all->SetMarkerColor(2);
-	h1d_dxy_all->SetLineColor(2);
-	h1d_dxy_all->GetXaxis()->SetTitle("#sqrt{(#DeltaX/#sigma_{X})^{2}+(#DeltaY/#sigma_{Y})^{2}}");
-	h1d_dxy_all->GetXaxis()->SetTitleOffset(1.1);
-	h1d_dxy_all->GetXaxis()->CenterTitle(true);
-	h1d_dxy_all->Draw();
-	h1d_dxy_global_all->SetLineColor(1);
-	h1d_dxy_global_all->SetMarkerColor(1);
-	h1d_dxy_global_all->Draw("same");
-	leg->Draw();
 
-	c1_xyz->Print("poscut.eps");
+
+
+
+	TCanvas *c1_t_xy=new TCanvas("c1_t_xy","", 1200, 1600);
+	c1_t_xy->Divide(1,2);
+	c1_t_xy->cd(1);
+	TGraphErrors *t_x=new TGraphErrors(tmed.size(),&tmed.at(0),&mu_x.at(0),&ex.at(0),&rms_x.at(0));
+	t_x->GetXaxis()->SetTimeDisplay(1);
+	t_x->GetXaxis()->SetTimeFormat("%b/%d");
+	t_x->GetXaxis()->SetTimeOffset(0,"gmt");
+	t_x->SetTitle(Form("; Time; X [cm]"));
+	t_x->Draw("ap| ");
+
+	TLine* l_xall=new TLine(tmed.at(0), meanX_data_all, tmed.at(-1+tmed.size()), meanX_data_all);
+	TLine* lup_xall=new TLine(tmed.at(0), meanX_data_all+rmsX_data_all, tmed.at(-1+tmed.size()), meanX_data_all+rmsX_data_all);
+	TLine* ldn_xall=new TLine(tmed.at(0),  meanX_data_all-rmsX_data_all, tmed.at(-1+tmed.size()), meanX_data_all-rmsX_data_all);
+	l_xall->SetLineColor(2);
+	lup_xall->SetLineColor(2);
+	ldn_xall->SetLineColor(2);
+	l_xall->SetLineWidth(2);
+	lup_xall->SetLineWidth(2);
+	ldn_xall->SetLineWidth(2);
+	lup_xall->SetLineStyle(2);
+	ldn_xall->SetLineStyle(2);
+	l_xall->Draw();
+	lup_xall->Draw();
+	ldn_xall->Draw();
+
+	c1_t_xy->cd(2);
+	TGraphErrors *t_y=new TGraphErrors(tmed.size(),&tmed.at(0),&mu_y.at(0),&ex.at(0),&rms_y.at(0));
+	t_y->GetXaxis()->SetTimeDisplay(1);
+	t_y->GetXaxis()->SetTimeFormat("%b/%d");
+	t_y->GetXaxis()->SetTimeOffset(0,"gmt");
+	t_y->SetTitle(Form("; Time; Y Position [cm]"));
+	t_y->Draw("ap| ");
+
+	TLine* l_yall=new TLine(tmed.at(0), meanY_data_all, tmed.at(-1+tmed.size()), meanY_data_all);
+	TLine* lup_yall=new TLine(tmed.at(0), meanY_data_all+rmsY_data_all, tmed.at(-1+tmed.size()), meanY_data_all+rmsY_data_all);
+	TLine* ldn_yall=new TLine(tmed.at(0), meanY_data_all-Y_data_all, tmed.at(-1+tmed.size()), meanY_data_all-Y_data_all);
+	l_yall->SetLineColor(2);
+	lup_yall->SetLineColor(2);
+	ldn_yall->SetLineColor(2);
+	l_yall->SetLineWidth(2);
+	lup_yall->SetLineWidth(2);
+	ldn_yall->SetLineWidth(2);
+	lup_yall->SetLineStyle(2);
+	ldn_yall->SetLineStyle(2);
+	l_yall->Draw();
+	lup_yall->Draw();
+	ldn_yall->Draw();
+
+	c1_t_xy->Print(Form("time_vs_beamXY.eps"));
+
+
+
+
+
+	/*
+	   TLegend *leg = new TLegend(0.14,0.65,.6,0.85);
+	   leg->SetFillStyle(0);
+	   leg->AddEntry(h1d_dz_all, "Fit then Sum", "ep");
+	   leg->AddEntry(h1d_dz_global_all, "Sum then Fit", "ep");
+
+	   TCanvas *c1_xyz=new TCanvas("c1_xyz","", 1200, 1800);
+	   c1_xyz->Divide(1,4);
+
+	   c1_xyz->cd(1);
+	   h1d_dz_all->SetMarkerColor(2);
+	   h1d_dz_all->SetLineColor(2);
+	   h1d_dz_all->GetXaxis()->SetTitle("#DeltaZ/#sigma_{z}");
+	   h1d_dz_all->GetXaxis()->SetTitleOffset(1.1);
+	   h1d_dz_all->GetXaxis()->CenterTitle(true);
+	   h1d_dz_all->Draw();
+	   h1d_dz_global_all->SetLineColor(1);
+	   h1d_dz_global_all->SetMarkerColor(1);
+	   h1d_dz_global_all->Draw("same");
+	   leg->Draw();
+
+	   c1_xyz->cd(2);
+	   h1d_dy_all->SetMarkerColor(2);
+	   h1d_dy_all->SetLineColor(2);
+	   h1d_dy_all->GetXaxis()->SetTitle("#DeltaY/#sigma_{Y}");
+	   h1d_dy_all->GetXaxis()->SetTitleOffset(1.1);
+	   h1d_dy_all->GetXaxis()->CenterTitle(true);
+	   h1d_dy_all->Draw();
+	   h1d_dy_global_all->SetLineColor(1);
+	   h1d_dy_global_all->SetMarkerColor(1);
+	   h1d_dy_global_all->Draw("same");
+	   leg->Draw();
+
+	   c1_xyz->cd(3);
+	   h1d_dx_all->SetMarkerColor(2);
+	   h1d_dx_all->SetLineColor(2);
+	   h1d_dx_all->GetXaxis()->SetTitle("#DeltaX/#sigma_{X}");
+	   h1d_dx_all->GetXaxis()->SetTitleOffset(1.1);
+	   h1d_dx_all->GetXaxis()->CenterTitle(true);
+	   h1d_dx_all->Draw();
+	   h1d_dx_global_all->SetLineColor(1);
+	   h1d_dx_global_all->SetMarkerColor(1);
+	   h1d_dx_global_all->Draw("same");
+	   leg->Draw();
+
+
+	   c1_xyz->cd(4);
+	   h1d_dxy_all->SetMarkerColor(2);
+	   h1d_dxy_all->SetLineColor(2);
+	   h1d_dxy_all->GetXaxis()->SetTitle("#sqrt{(#DeltaX/#sigma_{X})^{2}+(#DeltaY/#sigma_{Y})^{2}}");
+	   h1d_dxy_all->GetXaxis()->SetTitleOffset(1.1);
+	   h1d_dxy_all->GetXaxis()->CenterTitle(true);
+	   h1d_dxy_all->Draw();
+	   h1d_dxy_global_all->SetLineColor(1);
+	   h1d_dxy_global_all->SetMarkerColor(1);
+	   h1d_dxy_global_all->Draw("same");
+	   leg->Draw();
+
+	   c1_xyz->Print("poscut.eps");
 
 
 	//All distributions -------------------------------------------------//
-  	ofstream myfile_all_output;
-  	myfile_all_output.open(Form("./poscut/pos_cut_all.csv"));
+	ofstream myfile_all_output;
+	myfile_all_output.open(Form("./poscut/pos_cut_all.csv"));
 
 	TCanvas *c1_zyx_st_all=new TCanvas("c1_zyx_st_all","", 1200, 1800);
 	c1_zyx_st_all->Divide(1,3);
@@ -385,7 +490,7 @@ void plot_beamXY_distributions() {
 	double mu_xst_all=fit_xst_all->GetParameter(0);
 	double sigma_xst_all=fit_xst_all->GetParameter(1);
 	myfile_all_output << mu_zst_all<<","<< sigma_zst_all<<","<<mu_yst_all<<","<<sigma_yst_all<<","<<mu_xst_all<<","<<sigma_xst_all<<"\n";
-  	myfile_all_output.close();
+	myfile_all_output.close();
 
 
 	TCanvas *c1_t_xyz=new TCanvas("c1_t_xyz","", 1200, 1800);
@@ -457,23 +562,23 @@ void plot_beamXY_distributions() {
 	ldn_xall->Draw();
 
 	c1_t_xyz->Print(Form("time_vs_ZYX.eps"));
-*/
+	*/
 
 
 
-	// Vertical alignment.
-	//auto 
-	//auto *tv1 = new TText(0.66,0.165,"Bottom adjusted");
-	//tv1->SetTextAlign(11); tv1->SetTextSize(0.12);
-	//tv1->Draw();
+		// Vertical alignment.
+		//auto 
+		//auto *tv1 = new TText(0.66,0.165,"Bottom adjusted");
+		//tv1->SetTextAlign(11); tv1->SetTextSize(0.12);
+		//tv1->Draw();
 
-	// Draw labels on the y axis
-	//TText *t = new TText();
-	//t->SetTextAlign(32);
-	//t->SetTextSize(0.035);
-	//t->SetTextFont(72);
-	//char *labels[6] = {"Jan98","Feb98","Mar98","Apr98","May98","Jun98"};
-	//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
+		// Draw labels on the y axis
+		//TText *t = new TText();
+		//t->SetTextAlign(32);
+		//t->SetTextSize(0.035);
+		//t->SetTextFont(72);
+		//char *labels[6] = {"Jan98","Feb98","Mar98","Apr98","May98","Jun98"};
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
 
 
 
