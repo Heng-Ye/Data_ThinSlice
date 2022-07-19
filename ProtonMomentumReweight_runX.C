@@ -85,6 +85,10 @@ void ProtonMomentumReweight_run5387::Loop() {
 	//std::cout<<"tot:"<<tot_hr<<" [hrs]"<<std::endl;
 	//-------------------------------------------------------------------//
 
+	//Basic configure ------//
+	BetheBloch BB;
+	BB.SetPdgCode(2212);
+	//----------------------//
 
 	//book histograms -------------------------------------------------------------------------//
 	//trklen
