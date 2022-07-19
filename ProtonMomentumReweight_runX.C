@@ -48,6 +48,7 @@
 #include "./headers/BasicParameters.h"
 #include "./headers/BasicAnaFunc.h"
 #include "./headers/util.h"
+#include "./headers/BetheBloch.h"
 
 #include <cassert>
 
