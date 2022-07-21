@@ -538,7 +538,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 		}
 
 		//ke at end point ---------------------------------------------------------------------//
-		double kebb=-1; if (fitted_KE>0) kebb=fitted_KE-BB.KEAtLength(fitted_KE, range_reco);
+		double kebb=-1; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
 		double kecalo=-1; kecalo=fitted_KE-ke_calo_MeV;
 
 
