@@ -458,6 +458,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 		vector<double> trkdedx; //dedx 
 		vector<double> trkres; //rr
 		//if (IsBQ&&IsCaloSize&&IsPandoraSlice) { //if calo size not empty
+		//if (IsCaloSize) { //if calo size not empty
 		if (IsBeamMom&&IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
 
 			h2d_xy_noSCE->Fill(xst_nosce, yst_nosce);
@@ -525,11 +526,16 @@ void ProtonMomentumReweight_run5387::Loop() {
 		} //if calo size not empty
 
 		//hypothetical length -------------------------------------------------------------------------------------//
-		double fitted_length=-1; 
+		double fitted_length=-1;
+                std::reverse(trkdedx.begin(),trkdedx.end());  
+		std::reverse(trkres.begin(),trkres.end()); 
 		double tmp_fitted_length=BB.Fit_dEdx_Residual_Length(trkdedx, trkres, 2212, false);
 		if (tmp_fitted_length>0) fitted_length=tmp_fitted_length;
 		double fitted_KE=-1; 
-		if (fitted_length>0) fitted_KE=BB.KEFromRangeSpline(fitted_length);
+		if (fitted_length>0) { 
+			fitted_KE=BB.KEFromRangeSpline(fitted_length);
+			//cout<<"event:"<<event<<" evttime:"<<evttime<<" fitted_KE:"<<endl;
+		}
 
 		//ke at end point ---------------------------------------------------------------------//
 		double kebb=-1; if (fitted_KE>0) kebb=fitted_KE-BB.KEAtLength(fitted_KE, range_reco);
@@ -660,7 +666,8 @@ void ProtonMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d.root",run),"RECREATE");
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 		T0->Write();
 		Tmed->Write();
