@@ -531,15 +531,15 @@ void ProtonMomentumReweight_run5387::Loop() {
 		std::reverse(trkres.begin(),trkres.end()); 
 		double tmp_fitted_length=BB.Fit_dEdx_Residual_Length(trkdedx, trkres, 2212, false);
 		if (tmp_fitted_length>0) fitted_length=tmp_fitted_length;
-		double fitted_KE=-1; 
+		double fitted_KE=-50; 
 		if (fitted_length>0) { 
 			fitted_KE=BB.KEFromRangeSpline(fitted_length);
 			//cout<<"event:"<<event<<" evttime:"<<evttime<<" fitted_KE:"<<endl;
 		}
 
 		//ke at end point ---------------------------------------------------------------------//
-		double kebb=-1; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
-		double kecalo=-1; kecalo=fitted_KE-ke_calo_MeV;
+		double kebb=-50; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
+		double kecalo=-50; kecalo=fitted_KE-ke_calo_MeV;
 
 
 		if (IsCaloSize&&IsPandoraSlice) { //CaloSz
@@ -666,7 +666,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d.root",run),"RECREATE");
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d_new_stepsz0.105.root",run),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 		T0->Write();
