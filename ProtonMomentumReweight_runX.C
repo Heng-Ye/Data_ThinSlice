@@ -666,7 +666,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d_new_stepsz0.105.root",run),"RECREATE");
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d_.root",run),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 		T0->Write();
