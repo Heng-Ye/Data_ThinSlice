@@ -577,7 +577,7 @@ void ProtonCaloKE_run5387::Loop() {
 	//TFile *fout = new TFile(Form("data_kecalo.root"),"RECREATE");
 	//TFile *fout = new TFile(Form("data_kecalo_lowresol_withbeammomcut_intersectioncut.root"),"RECREATE");
 	//TFile *fout = new TFile(Form("data_kecalo_beamxy.root"),"RECREATE");
-	TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEcalo_ELoss/data_kecalo_beamxy_run%d.root",run),"RECREATE");
+	TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEcalo_ELoss/data_kecalo_beamxy_run%d.root", run),"RECREATE");
 		h1d_kebeam->Write();
 		h1d_kebeam_stop->Write();
 
