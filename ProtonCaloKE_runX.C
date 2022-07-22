@@ -44,7 +44,7 @@
 #include <Math/Vector3D.h>
 #include <Fit/Fitter.h>
 
-#include "./cali/dedx_function_r5387.h"
+//#include "./cali/dedx_function_r5387.h"
 #include "./headers/BasicParameters.h"
 #include "./headers/BasicAnaFunc.h"
 #include "./headers/util.h"
@@ -296,9 +296,9 @@ void ProtonCaloKE_run5387::Loop() {
                 vector<double> EDept;
 		double pid=-99;
 
+                vector<double> trkdedx;
+                vector<double> trkres;
                 if (IsCaloSize) { //if calo size not empty
-                        vector<double> trkdedx;
-                        vector<double> trkres;
                   	for (size_t h=0; h<primtrk_dedx->size(); ++h) { //loop over reco hits in a track
                         	double hitx_reco=primtrk_hitx->at(h);
                         	double hity_reco=primtrk_hity->at(h);
