@@ -83,7 +83,8 @@ void ProtonCaloKE_run5387::Loop() {
 	//int ndke=800;
 	//int ndke=320;
 	//int ndke=160;
-	int ndke=80;
+	//int ndke=80;
+	int ndke=400;
 	double dkemin=-800;
 	double dkemax=800;
 
