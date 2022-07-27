@@ -91,6 +91,11 @@ void ProtonMomentumReweight_run5387::Loop() {
 	BB.SetPdgCode(2212);
 	//----------------------//
 
+        //const. E-loss assumption      
+        double const_eloss_data=45.6084/0.99943; //const E-loss from fit (calo)
+	//p[0]:45.6084; err_p[0]:0.296889; p[1]:-0.99943 err_p[1]:0.00617258
+        //
+
 	//book histograms -------------------------------------------------------------------------//
 	//trklen
 	int n_b=30;
@@ -117,6 +122,11 @@ void ProtonMomentumReweight_run5387::Loop() {
 	double ymax_edept=800;
 	TH1D *h1d_kebeam=new TH1D("h1d_kebeam","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kebeam_stop=new TH1D("h1d_kebeam_stop","",ny_edept,ymin_edept,ymax_edept);
+	TH1D *h1d_kebeam_inel=new TH1D("h1d_kebeam_inel","",ny_edept,ymin_edept,ymax_edept);
+
+	TH1D *h1d_keffbeam=new TH1D("h1d_keffbeam","",ny_edept,ymin_edept,ymax_edept);
+	TH1D *h1d_keffbeam_stop=new TH1D("h1d_keffbeam_stop","",ny_edept,ymin_edept,ymax_edept);
+	TH1D *h1d_keffbeam_inel=new TH1D("h1d_keffbeam_inel","",ny_edept,ymin_edept,ymax_edept);
 
 	TH1D *h1d_kehy=new TH1D("h1d_kehy","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kehy_stop=new TH1D("h1d_kehy_stop","",ny_edept,ymin_edept,ymax_edept);
@@ -559,9 +569,9 @@ void ProtonMomentumReweight_run5387::Loop() {
 			h1d_pbeam->Fill(1000.*p_beam);
 
 			h1d_kehy->Fill(fitted_KE);
-
 			h1d_phy->Fill(1000.*ke2p(fitted_KE/1000.));
 
+			h1d_keffbeam->Fill(ke_beam_MeV-const_eloss_data);
 
 			h1d_trklen_BQ->Fill(range_reco);
 			if (IsXY) { 
@@ -586,6 +596,8 @@ void ProtonMomentumReweight_run5387::Loop() {
 				h1d_phy_stop->Fill(1000.*ke2p(fitted_KE/1000.));
 
 				h1d_kehy_stop->Fill(fitted_KE);
+
+				h1d_keffbeam_stop->Fill(ke_beam_MeV-const_eloss_data);
 
 				h1d_dist_stop->Fill(d_sce);
 				h1d_trklen_stop->Fill(range_reco);
@@ -617,6 +629,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 				Fill1DHist(h1d_trklen_RecoInel,range_reco);
 
 				h1d_kehy_inel->Fill(fitted_KE);
+				h1d_keffbeam_inel->Fill(ke_beam_MeV-const_eloss_data);
 
 				h1d_kend_calo_inel->Fill(kecalo);
 				h1d_kend_bb_inel->Fill(kebb);
@@ -666,7 +679,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d_.root",run),"RECREATE");
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d.root",run),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 		T0->Write();
@@ -684,11 +697,15 @@ void ProtonMomentumReweight_run5387::Loop() {
 
 		h1d_kebeam->Write();
 		h1d_kebeam_stop->Write();
+		h1d_kebeam_inel->Write();
 
 		h1d_kehy->Write();
 		h1d_kehy_stop->Write();
 		h1d_kehy_inel->Write();
 
+		h1d_keffbeam->Write();
+		h1d_keffbeam_stop->Write();
+		h1d_keffbeam_inel->Write();
 
 		h1d_prange_stop->Write();
 		h1d_pcalo_stop->Write();
