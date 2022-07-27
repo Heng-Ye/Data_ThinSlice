@@ -547,9 +547,14 @@ void ProtonMomentumReweight_run5387::Loop() {
 			//cout<<"event:"<<event<<" evttime:"<<evttime<<" fitted_KE:"<<endl;
 		}
 
+		//const E-loss asump
+		double keffbeam=ke_beam_MeV-const_eloss_data;
+
 		//ke at end point ---------------------------------------------------------------------//
-		double kebb=-50; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
-		double kecalo=-50; kecalo=fitted_KE-ke_calo_MeV;
+		//double kebb=-50; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
+		double kebb=-50; kebb=BB.KEAtLength(keffbeam, range_reco);
+		//double kecalo=-50; kecalo=fitted_KE-ke_calo_MeV;
+		double kecalo=-50; kecalo=keffbeam-ke_calo_MeV;
 
 
 		if (IsCaloSize&&IsPandoraSlice) { //CaloSz
@@ -571,7 +576,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 			h1d_kehy->Fill(fitted_KE);
 			h1d_phy->Fill(1000.*ke2p(fitted_KE/1000.));
 
-			h1d_keffbeam->Fill(ke_beam_MeV-const_eloss_data);
+			h1d_keffbeam->Fill(keffbeam);
 
 			h1d_trklen_BQ->Fill(range_reco);
 			if (IsXY) { 
@@ -597,7 +602,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 
 				h1d_kehy_stop->Fill(fitted_KE);
 
-				h1d_keffbeam_stop->Fill(ke_beam_MeV-const_eloss_data);
+				h1d_keffbeam_stop->Fill(keffbeam);
 
 				h1d_dist_stop->Fill(d_sce);
 				h1d_trklen_stop->Fill(range_reco);
@@ -629,7 +634,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 				Fill1DHist(h1d_trklen_RecoInel,range_reco);
 
 				h1d_kehy_inel->Fill(fitted_KE);
-				h1d_keffbeam_inel->Fill(ke_beam_MeV-const_eloss_data);
+				h1d_keffbeam_inel->Fill(keffbeam);
 
 				h1d_kend_calo_inel->Fill(kecalo);
 				h1d_kend_bb_inel->Fill(kebb);
