@@ -122,14 +122,17 @@ void ProtonMomentumReweight_run5387::Loop() {
 	double ymax_edept=800;
 	TH1D *h1d_kebeam=new TH1D("h1d_kebeam","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kebeam_stop=new TH1D("h1d_kebeam_stop","",ny_edept,ymin_edept,ymax_edept);
+	TH1D *h1d_kebeam_el=new TH1D("h1d_kebeam_el","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kebeam_inel=new TH1D("h1d_kebeam_inel","",ny_edept,ymin_edept,ymax_edept);
 
 	TH1D *h1d_keffbeam=new TH1D("h1d_keffbeam","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_keffbeam_stop=new TH1D("h1d_keffbeam_stop","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_keffbeam_inel=new TH1D("h1d_keffbeam_inel","",ny_edept,ymin_edept,ymax_edept);
+	TH1D *h1d_keffbeam_el=new TH1D("h1d_keffbeam_el","",ny_edept,ymin_edept,ymax_edept);
 
 	TH1D *h1d_kehy=new TH1D("h1d_kehy","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kehy_stop=new TH1D("h1d_kehy_stop","",ny_edept,ymin_edept,ymax_edept);
+	TH1D *h1d_kehy_el=new TH1D("h1d_kehy_el","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kehy_inel=new TH1D("h1d_kehy_inel","",ny_edept,ymin_edept,ymax_edept);
 
 	TH1D *h1d_kerange_stop=new TH1D("h1d_kerange_stop","", ny_edept, ymin_edept, ymax_edept);
@@ -630,6 +633,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 				Fill1DHist(h1d_trklen_ElRich, range_reco);
 			}
 			if (IsRecoInel) { //reco_inel
+				h1d_kebeam_inel->Fill(ke_beam_MeV);
 				//h1d_trklen_RecoInel->Fill(range_reco);
 				Fill1DHist(h1d_trklen_RecoInel,range_reco);
 
@@ -641,6 +645,9 @@ void ProtonMomentumReweight_run5387::Loop() {
 
 			} //reco inel
 			if (IsRecoEl) { //reco_el
+				h1d_kehy_el->Fill(fitted_KE);
+				h1d_kebeam_el->Fill(ke_beam_MeV);
+				h1d_keffbeam_el->Fill(keffbeam);
 				h1d_kend_calo_el->Fill(kecalo);
 				h1d_kend_bb_el->Fill(kebb);
 			} //reco_el
@@ -702,14 +709,17 @@ void ProtonMomentumReweight_run5387::Loop() {
 
 		h1d_kebeam->Write();
 		h1d_kebeam_stop->Write();
+		h1d_kebeam_el->Write();
 		h1d_kebeam_inel->Write();
 
 		h1d_kehy->Write();
 		h1d_kehy_stop->Write();
+		h1d_kehy_el->Write();
 		h1d_kehy_inel->Write();
 
 		h1d_keffbeam->Write();
 		h1d_keffbeam_stop->Write();
+		h1d_keffbeam_el->Write();
 		h1d_keffbeam_inel->Write();
 
 		h1d_prange_stop->Write();
