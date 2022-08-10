@@ -146,29 +146,47 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	TH1D *h1d_kebeam_stop=new TH1D("h1d_kebeam_stop","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kebeam_el=new TH1D("h1d_kebeam_el","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kebeam_inel=new TH1D("h1d_kebeam_inel","",ny_edept,ymin_edept,ymax_edept);
+	h1d_kebeam->Sumw2();
+	h1d_kebeam_stop->Sumw2();
+	h1d_kebeam_el->Sumw2();
+	h1d_kebeam_inel->Sumw2();
 
 	TH1D *h1d_keffbeam=new TH1D("h1d_keffbeam","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_keffbeam_stop=new TH1D("h1d_keffbeam_stop","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_keffbeam_el=new TH1D("h1d_keffbeam_el","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_keffbeam_inel=new TH1D("h1d_keffbeam_inel","",ny_edept,ymin_edept,ymax_edept);
+	h1d_keffbeam->Sumw2();
+	h1d_keffbeam_stop->Sumw2();
+	h1d_keffbeam_el->Sumw2();
+	h1d_keffbeam_inel->Sumw2();
 
 	TH1D *h1d_kehy=new TH1D("h1d_kehy","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kehy_stop=new TH1D("h1d_kehy_stop","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kehy_el=new TH1D("h1d_kehy_el","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kehy_inel=new TH1D("h1d_kehy_inel","",ny_edept,ymin_edept,ymax_edept);
+	h1d_kehy->Sumw2();
+	h1d_kehy_stop->Sumw2();
+	h1d_kehy_el->Sumw2();
+	h1d_kehy_inel->Sumw2();
 
 	TH1D *h1d_kerange_stop=new TH1D("h1d_kerange_stop","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kecalo_stop=new TH1D("h1d_kecalo_stop","", ny_edept, ymin_edept, ymax_edept);
+	h1d_kerange_stop->Sumw2();
+	h1d_kecalo_stop->Sumw2();
 
 	TH1D *h1d_kend_calo_stop=new TH1D("h1d_kend_calo_stop","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_calo_el=new TH1D("h1d_kend_calo_el","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_calo_inel=new TH1D("h1d_kend_calo_inel","", ny_edept, ymin_edept, ymax_edept);
+	h1d_kend_calo_stop->Sumw2();
+	h1d_kend_calo_el->Sumw2();
+	h1d_kend_calo_inel->Sumw2();
 
 	TH1D *h1d_kend_bb_stop=new TH1D("h1d_kend_bb_stop","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_bb_el=new TH1D("h1d_kend_bb_el","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_bb_inel=new TH1D("h1d_kend_bb_inel","", ny_edept, ymin_edept, ymax_edept);
-
-
+	h1d_kend_bb_stop->Sumw2();
+	h1d_kend_bb_el->Sumw2();
+	h1d_kend_bb_inel->Sumw2();
 
 	//mom
 	int nx=250;	
@@ -176,12 +194,18 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	double xmax=2000.; //pmax [MeV/c]
 	TH1D *h1d_pbeam=new TH1D("h1d_pbeam","",nx,xmin,xmax);
 	TH1D *h1d_pbeam_stop=new TH1D("h1d_pbeam_stop","",nx,xmin,xmax);
+	h1d_pbeam->Sumw2();
+	h1d_pbeam_stop->Sumw2();
 
 	TH1D *h1d_phy=new TH1D("h1d_phy","",nx,xmin,xmax);
 	TH1D *h1d_phy_stop=new TH1D("h1d_phy_stop","",nx,xmin,xmax);
+	h1d_phy->Sumw2();
+	h1d_phy_stop->Sumw2();
 
 	TH1D *h1d_prange_stop=new TH1D("h1d_prange_stop","",nx,xmin,xmax);
 	TH1D *h1d_pcalo_stop=new TH1D("h1d_pcalo_stop","",nx,xmin,xmax);
+	h1d_prange_stop->Sumw2();
+	h1d_pcalo_stop->Sumw2();
 
 	//dedx_rr
 	TH2D *h2d_rr_dedx_recoSTOP=new TH2D("h2d_rr_dedx_recoSTOP","",240,0,120,90,0,30);
