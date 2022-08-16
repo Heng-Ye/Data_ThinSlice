@@ -557,15 +557,13 @@ void ProtonCaloKE_run5387::Loop() {
 
 
 		//hypothetical length -------------------------------------------------------------------------------------//
-		double fitted_length=-1; 
+		double fitted_length=-1;
+                std::reverse(trkdedx.begin(),trkdedx.end());  
+		std::reverse(trkres.begin(),trkres.end());  
 		double tmp_fitted_length=BB.Fit_dEdx_Residual_Length(trkdedx, trkres, 2212, false);
 		if (tmp_fitted_length>0) fitted_length=tmp_fitted_length;
 		double fitted_KE=-50; 
 		if (fitted_length>0) fitted_KE=BB.KEFromRangeSpline(fitted_length);
-
-
-
-
 
 		//if (IsCaloSize&&IsPandoraSlice) { //CaloSz
 			//h1d_trklen_CaloSz->Fill(range_reco);
