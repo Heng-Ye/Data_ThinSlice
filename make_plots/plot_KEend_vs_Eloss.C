@@ -97,14 +97,27 @@ void plot_KEend_vs_Eloss() {
 	//TString outpath="./plot_KEend_Eloss/";
 	//TString fin="../data_kecalo_scanEloss.root";
 	
-	TString outpath="./plot_KEend_Eloss_beamxy/";
-	TString fin="../data_kecalo_beamxy.root";
+	//TString outpath="./plot_KEend_Eloss_beamxy/";
+	//TString fin="../data_kecalo_beamxy.root";
+	//TString fin="/dune/data2/users/hyliao/protonana/v09_39_01/KEcalo_ELoss/data_kecalo_beamxy_runAll.root";
 	
+	//TString outpath="./plot_KEend_Eloss_hyper_stop/";
+	//TString fin="/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_ELoss/data_kehy_beamxy_runAll.root";
+
+	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/hy/";
+	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/hy_stop/";
+	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/range_stop/";
+	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/range/";
+	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/calo/";
+	TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/calo_stop/";
+	TString fin="/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_ELoss/data_kehy_beamxy_runAll.root";
+
 	//setup e-loss map 
 	vector<double> Eloss;
 	const int n_eloss=40;
-        double Eloss_start=38.;
+        double Eloss_start=38.; //calo
         double dEloss=0.5;
+        //double Eloss_start=16.; //hy, range
         for (int k=0; k<n_eloss; ++k) {
                 double eloss_step=Eloss_start+(double)k*dEloss;
                 Eloss.push_back(eloss_step);
@@ -119,7 +132,6 @@ void plot_KEend_vs_Eloss() {
 		//if (k==1) Eloss.push_back(40);
 	//}
 	TH1D *h1d[n_eloss];
-
 
         //plot style --------------------------------------------------------------------//
         gROOT->LoadMacro(" ~/protoDUNEStyle.C"); //load pDUNE style
@@ -146,13 +158,20 @@ void plot_KEend_vs_Eloss() {
                 //double eloss_step=Eloss_start+(double)k*dEloss;
                 //Eloss.push_back(eloss_step);
 
-                h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_tune_%d",k));
+                //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_tune_%d",k));
+                //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_hy_tune_%d",k));
+                //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_hy_stop_tune_%d",k));
+                //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_range_stop_tune_%d",k));
+                //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_range_tune_%d",k));
+                //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_calo_tune_%d",k));
+                h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_calo_stop_tune_%d",k));
 
 		//fit -------------------------------------------------------------------------------//
 		fitke[k]=FitKEEnd(h1d[k],2);
 
 		c_->cd(k+1);
-		f2d[k]=new TH2D(Form("f2d_%d",k),"",200,-100,100, 100, 0,1000);
+		//f2d[k]=new TH2D(Form("f2d_%d",k),"",200,-100,100, 100, 0,2000);
+		f2d[k]=new TH2D(Form("f2d_%d",k),"",200,-100,100, 100, 0,4000);
 		f2d[k]->SetTitle(Form("E-loss=%.1f MeV; Proton KE [MeV]; Events",Eloss.at(k)));
 		f2d[k]->Draw();
 		h1d[k]->Draw("same");
@@ -175,13 +194,19 @@ void plot_KEend_vs_Eloss() {
 	gr_de_mu->SetTitle("Data");
 	gr_de_mu->GetXaxis()->SetTitle("<#DeltaE> [MeV]");
 	gr_de_mu->GetYaxis()->SetTitle("#mu of KE_{end} [MeV]");
-	TH2D* f2d_fit=new TH2D("f2d_fit","", 25, 35, 60, 25,-10,15);
+	//TH2D* f2d_fit=new TH2D("f2d_fit","", 25, 35, 60, 25,-10,15);
+
+	double fit_min=37.; //calo
+	double fit_max=58.; //calo
+	
+	//double fit_min=15.; //hy
+	//double fit_max=35.; //hy
+	
+	TH2D* f2d_fit=new TH2D("f2d_fit","", 20, fit_min, fit_max, 25,-10,15);
 	f2d_fit->SetTitle("Data; <#DeltaE> [MeV]; #mu of KE_{end} [MeV]");	
 	f2d_fit->Draw();
 	gr_de_mu->Draw("p same");
 
-	double fit_min=37.;
-	double fit_max=58.;
         TF1 *line_best=new TF1("line_best", "[0]+[1]*x", fit_min, fit_max);
 	double mm=(mu.at(0)-mu.at(-1+mu.size()))/(Eloss.at(0)-Eloss.at(-1+Eloss.size()));
 	double bb=mu.at(0)-mm*Eloss.at(0);
