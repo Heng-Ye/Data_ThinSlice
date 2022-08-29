@@ -105,19 +105,19 @@ void plot_KEend_vs_Eloss() {
 	//TString fin="/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_ELoss/data_kehy_beamxy_runAll.root";
 
 	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/hy/";
-	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/hy_stop/";
+	TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/hy_stop/";
 	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/range_stop/";
 	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/range/";
 	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/calo/";
-	TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/calo_stop/";
+	//TString outpath="./plot_KEend_Eloss_nobmrw_beamxy/calo_stop/";
 	TString fin="/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_ELoss/data_kehy_beamxy_runAll.root";
 
 	//setup e-loss map 
 	vector<double> Eloss;
 	const int n_eloss=40;
-        double Eloss_start=38.; //calo
+        //double Eloss_start=38.; //calo
         double dEloss=0.5;
-        //double Eloss_start=16.; //hy, range
+        double Eloss_start=16.; //hy, range
         for (int k=0; k<n_eloss; ++k) {
                 double eloss_step=Eloss_start+(double)k*dEloss;
                 Eloss.push_back(eloss_step);
@@ -160,11 +160,11 @@ void plot_KEend_vs_Eloss() {
 
                 //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_tune_%d",k));
                 //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_hy_tune_%d",k));
-                //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_hy_stop_tune_%d",k));
+                h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_hy_stop_tune_%d",k));
                 //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_range_stop_tune_%d",k));
                 //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_range_tune_%d",k));
                 //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_calo_tune_%d",k));
-                h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_calo_stop_tune_%d",k));
+                //h1d[k]=(TH1D*)f_->Get(Form("h1d_KEend_calo_stop_tune_%d",k));
 
 		//fit -------------------------------------------------------------------------------//
 		fitke[k]=FitKEEnd(h1d[k],2);
@@ -196,11 +196,11 @@ void plot_KEend_vs_Eloss() {
 	gr_de_mu->GetYaxis()->SetTitle("#mu of KE_{end} [MeV]");
 	//TH2D* f2d_fit=new TH2D("f2d_fit","", 25, 35, 60, 25,-10,15);
 
-	double fit_min=37.; //calo
-	double fit_max=58.; //calo
+	//double fit_min=37.; //calo
+	//double fit_max=58.; //calo
 	
-	//double fit_min=15.; //hy
-	//double fit_max=35.; //hy
+	double fit_min=15.; //hy
+	double fit_max=35.; //hy
 	
 	TH2D* f2d_fit=new TH2D("f2d_fit","", 20, fit_min, fit_max, 25,-10,15);
 	f2d_fit->SetTitle("Data; <#DeltaE> [MeV]; #mu of KE_{end} [MeV]");	
