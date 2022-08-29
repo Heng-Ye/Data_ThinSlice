@@ -91,9 +91,20 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	BB.SetPdgCode(2212);
 	//----------------------//
 
-        //const. E-loss assumption      
+        //const. E-loss assumption -----------------------------------------------//      
         double const_eloss_data=45.6084/0.99943; //const E-loss from fit (calo)
 	//p[0]:45.6084; err_p[0]:0.296889; p[1]:-0.99943 err_p[1]:0.00617258
+	
+	//hy -------------------------------------------//
+	double Eloss_data_hy_stop=25.1911/1.00063;
+	double R_fit_hy=0.9994965057702763;
+	double er_R_fit_hy=0.04516809864770481;
+
+	//p[0]:25.1911
+	//err_p[0]:0.114666
+	//p[1]:-1.00063
+	//err_p[1]:0.00439028
+	
        
 	//New weighting func (using KEff_fit_stop at TPC FF as a reference) ------//
 	double mu_denom_data=411.06602388610895; //fit at ff
@@ -187,6 +198,14 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	h1d_kend_bb_stop->Sumw2();
 	h1d_kend_bb_el->Sumw2();
 	h1d_kend_bb_inel->Sumw2();
+
+	//Ratio plot -----------------------------------------------------------------------------------------------------------------//
+	TH2D *h2d_trklen_ratio_KEbbfit_KEffbeam_stop=new TH2D("h2d_trklen_ratio_KEbbfit_KEffbeam_stop","", 14000,0,140,4000,-20,20);
+	TH2D *h2d_trklen_ratio_KEbbfit_KEffbeam_el=new TH2D("h2d_trklen_ratio_KEbbfit_KEffbeam_el","", 14000,0,140,4000,-20,20);
+	TH2D *h2d_trklen_ratio_KEbbfit_KEffbeam_inel=new TH2D("h2d_trklen_ratio_KEbbfit_KEffbeam_inel","", 14000,0,140,4000,-20,20);
+
+
+
 
 	//mom
 	int nx=250;	
@@ -590,14 +609,17 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		std::reverse(trkres.begin(),trkres.end()); 
 		double tmp_fitted_length=BB.Fit_dEdx_Residual_Length(trkdedx, trkres, 2212, false);
 		if (tmp_fitted_length>0) fitted_length=tmp_fitted_length;
-		double fitted_KE=-50; 
+		double fitted_KE=-999; 
 		if (fitted_length>0) { 
 			fitted_KE=BB.KEFromRangeSpline(fitted_length);
 			//cout<<"event:"<<event<<" evttime:"<<evttime<<" fitted_KE:"<<endl;
 		}
 
-		//const E-loss asump
-		double keffbeam=ke_beam_MeV-const_eloss_data;
+		//const E-loss asump -------------------------------------//
+		//double keffbeam=ke_beam_MeV-const_eloss_data;
+		double keffbeam=9999999;
+		keffbeam=(ke_beam_MeV-Eloss_data_hy_stop)*R_fit_hy;
+		double ratio_KEbbfit_KEffbeam=fitted_KE/keffbeam;
 
 		//ke at end point ---------------------------------------------------------------------//
 		//double kebb=-50; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
@@ -619,7 +641,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		//if (IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
 		if (IsBeamMom&&IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
 			double mom_rw_minchi2=1.;
-			if ((p_beam*1000.)>=mu_min&&(p_beam*1000.)<=mu_max) mom_rw_minchi2=kerw->Eval(keffbeam); //bmrw
+			//if ((p_beam*1000.)>=mu_min&&(p_beam*1000.)<=mu_max) mom_rw_minchi2=kerw->Eval(keffbeam); //bmrw
 
 			//if (IsIntersection==false&&IsBeamMom&&IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
 			h1d_kebeam->Fill(ke_beam_MeV, mom_rw_minchi2);
@@ -680,6 +702,12 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 				if (IsXY) h1d_trklen_stop_XY->Fill(range_reco);
 
 				Fill1DHist(h1d_trklen_ElRich, range_reco);
+
+
+				h2d_trklen_ratio_KEbbfit_KEffbeam_stop->Fill(range_reco,ratio_KEbbfit_KEffbeam);
+
+
+
 			}
 			if (IsRecoInel) { //reco_inel
 				//h1d_trklen_RecoInel->Fill(range_reco);
@@ -691,6 +719,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 
 				h1d_kend_calo_inel->Fill(kecalo, mom_rw_minchi2);
 				h1d_kend_bb_inel->Fill(kebb, mom_rw_minchi2);
+				h2d_trklen_ratio_KEbbfit_KEffbeam_inel->Fill(range_reco,ratio_KEbbfit_KEffbeam);
 
 			} //reco inel
 			if (IsRecoEl) { //reco_el
@@ -699,6 +728,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 				h1d_kehy_el->Fill(fitted_KE, mom_rw_minchi2);
 				h1d_kend_calo_el->Fill(kecalo, mom_rw_minchi2);
 				h1d_kend_bb_el->Fill(kebb, mom_rw_minchi2);
+				h2d_trklen_ratio_KEbbfit_KEffbeam_el->Fill(range_reco,ratio_KEbbfit_KEffbeam);
 			} //reco_el
 		}
 
@@ -740,7 +770,8 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_BMRW/proton_beamxy_beammom_bmrw_run%d.root",run),"RECREATE");
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_BMRW/proton_beamxy_beammom_bmrw_run%d.root",run),"RECREATE");
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_KEBEAMFF/proton_beamxy_beammom_run%d.root",run),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 		T0->Write();
@@ -831,6 +862,11 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		h2d_time_pcalo_stop->Write();
 		h2d_time_prange_stop->Write();
 		h2d_time_pcaloOverprange_stop->Write();
+
+		h2d_trklen_ratio_KEbbfit_KEffbeam_stop->Write();
+		h2d_trklen_ratio_KEbbfit_KEffbeam_el->Write();
+		h2d_trklen_ratio_KEbbfit_KEffbeam_inel->Write();
+
 
 		fout->Close();
 
