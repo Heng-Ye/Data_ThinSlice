@@ -567,9 +567,9 @@ void ProtonMomentumReweight_run5387::Loop() {
 
 		//ke at end point ---------------------------------------------------------------------//
 		//double kebb=-50; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
-		double kebb=-50; kebb=BB.KEAtLength(keffbeam, range_reco);
+		double kebb=-9999.; kebb=BB.KEAtLength(keffbeam, range_reco);
 		//double kecalo=-50; kecalo=fitted_KE-ke_calo_MeV;
-		double kecalo=-50; kecalo=keffbeam-ke_calo_MeV;
+		double kecalo=-9999.; kecalo=keffbeam-ke_calo_MeV;
 
 
 		if (IsCaloSize&&IsPandoraSlice) { //CaloSz
@@ -585,14 +585,21 @@ void ProtonMomentumReweight_run5387::Loop() {
 		//if (IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
 		if (IsBeamMom&&IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
 			//if (IsIntersection==false&&IsBeamMom&&IsBeamXY&&IsBQ&&IsCaloSize&&IsPandoraSlice) {
-			h1d_kebeam->Fill(ke_beam_MeV);
-			h1d_pbeam->Fill(1000.*p_beam);
+			//h1d_kebeam->Fill(ke_beam_MeV);
+			//h1d_pbeam->Fill(1000.*p_beam);
 
-			h1d_kehy->Fill(fitted_KE);
-			h1d_phy->Fill(1000.*ke2p(fitted_KE/1000.));
+			Fill1DHist(h1d_kebeam, ke_beam_MeV);
+			Fill1DHist(h1d_pbeam, 1000.*p_beam);
 
-			h1d_keffbeam->Fill(keffbeam);
 
+			//h1d_kehy->Fill(fitted_KE);
+			//h1d_phy->Fill(1000.*ke2p(fitted_KE/1000.));
+			//h1d_keffbeam->Fill(keffbeam);
+
+			Fill1DHist(h1d_kehy, fitted_KE);
+			Fill1DHist(h1d_phy, 1000.*ke2p(fitted_KE/1000.));
+			Fill1DHist(h1d_keffbeam, keffbeam);
+			
 			h1d_trklen_BQ->Fill(range_reco);
 			if (IsXY) { 
 				h1d_trklen_XY->Fill(range_reco);
@@ -610,31 +617,46 @@ void ProtonMomentumReweight_run5387::Loop() {
 				h1d_zend_noSCE_stop->Fill(zend_nosce);
 				h1d_zend_stop->Fill(zend_sce);
 
-				h1d_kebeam_stop->Fill(ke_beam_MeV);
-				h1d_pbeam_stop->Fill(1000.*p_beam);
+				//h1d_kebeam_stop->Fill(ke_beam_MeV);
+				//h1d_pbeam_stop->Fill(1000.*p_beam);
+				
+				Fill1DHist(h1d_kebeam_stop, ke_beam_MeV);
+				Fill1DHist(h1d_pbeam_stop, 1000.*p_beam);
 
-				h1d_phy_stop->Fill(1000.*ke2p(fitted_KE/1000.));
+				//h1d_phy_stop->Fill(1000.*ke2p(fitted_KE/1000.));
+				Fill1DHist(h1d_phy_stop, 1000.*ke2p(fitted_KE/1000.));
 
-				h1d_kehy_stop->Fill(fitted_KE);
+				//h1d_kehy_stop->Fill(fitted_KE);
+				Fill1DHist(h1d_kehy_stop, fitted_KE);
 
-				h1d_keffbeam_stop->Fill(keffbeam);
+				//h1d_keffbeam_stop->Fill(keffbeam);
+				Fill1DHist(h1d_keffbeam_stop, keffbeam);
 
 				h1d_dist_stop->Fill(d_sce);
-				h1d_trklen_stop->Fill(range_reco);
-				h1d_kerange_stop->Fill(ke_range_MeV);
-				h1d_kecalo_stop->Fill(ke_calo_MeV);
+				//h1d_trklen_stop->Fill(range_reco);
+				//h1d_kerange_stop->Fill(ke_range_MeV);
+				//h1d_kecalo_stop->Fill(ke_calo_MeV);
 
+				Fill1DHist(h1d_trklen_stop, range_reco);
+				Fill1DHist(h1d_kerange_stop, ke_range_MeV);
+				Fill1DHist(h1d_kecalo_stop, ke_calo_MeV);
 
-				h1d_kend_calo_stop->Fill(kecalo);
-				h1d_kend_bb_stop->Fill(kebb);
+				//h1d_kend_calo_stop->Fill(kecalo);
+				//h1d_kend_bb_stop->Fill(kebb);
 
+				Fill1DHist(h1d_kend_calo_stop, kecalo);
+				Fill1DHist(h1d_kend_bb_stop, kebb);
 
 				double tmp_prange=1000.*ke2p(ke_range);
 				double tmp_pcalo=1000.*ke2p(ke_calo_MeV/1000.);
 				double tmp_ratio=tmp_pcalo/tmp_prange;
 
-				h1d_prange_stop->Fill(tmp_prange);
-				h1d_pcalo_stop->Fill(tmp_pcalo);
+				//h1d_prange_stop->Fill(tmp_prange);
+				//h1d_pcalo_stop->Fill(tmp_pcalo);
+
+				Fill1DHist(h1d_prange_stop, tmp_prange);
+				Fill1DHist(h1d_pcalo_stop, tmp_pcalo);
+
 
 				h2d_time_pcalo_stop->Fill(DT,tmp_pcalo);
 				h2d_time_prange_stop->Fill(DT,tmp_prange);
@@ -645,23 +667,38 @@ void ProtonMomentumReweight_run5387::Loop() {
 				Fill1DHist(h1d_trklen_ElRich, range_reco);
 			}
 			if (IsRecoInel) { //reco_inel
-				h1d_kebeam_inel->Fill(ke_beam_MeV);
+				//h1d_kebeam_inel->Fill(ke_beam_MeV);
 				//h1d_trklen_RecoInel->Fill(range_reco);
+
+				Fill1DHist(h1d_kebeam_inel, ke_beam_MeV);
 				Fill1DHist(h1d_trklen_RecoInel,range_reco);
 
-				h1d_kehy_inel->Fill(fitted_KE);
-				h1d_keffbeam_inel->Fill(keffbeam);
+				//h1d_kehy_inel->Fill(fitted_KE);
+				//h1d_keffbeam_inel->Fill(keffbeam);
 
-				h1d_kend_calo_inel->Fill(kecalo);
-				h1d_kend_bb_inel->Fill(kebb);
+				Fill1DHist(h1d_kehy_inel, fitted_KE);
+				Fill1DHist(h1d_keffbeam_inel, keffbeam);
+
+				//h1d_kend_calo_inel->Fill(kecalo);
+				//h1d_kend_bb_inel->Fill(kebb);
+
+				Fill1DHist(h1d_kend_calo_inel, kecalo);
+				Fill1DHist(h1d_kend_bb_inel, kebb);
 
 			} //reco inel
 			if (IsRecoEl) { //reco_el
-				h1d_kehy_el->Fill(fitted_KE);
-				h1d_kebeam_el->Fill(ke_beam_MeV);
-				h1d_keffbeam_el->Fill(keffbeam);
-				h1d_kend_calo_el->Fill(kecalo);
-				h1d_kend_bb_el->Fill(kebb);
+				//h1d_kehy_el->Fill(fitted_KE);
+				//h1d_kebeam_el->Fill(ke_beam_MeV);
+				//h1d_keffbeam_el->Fill(keffbeam);
+				//h1d_kend_calo_el->Fill(kecalo);
+				//h1d_kend_bb_el->Fill(kebb);
+
+				Fill1DHist(h1d_kehy_el, fitted_KE);
+				Fill1DHist(h1d_kebeam_el, ke_beam_MeV);
+				Fill1DHist(h1d_keffbeam_el, keffbeam);
+				Fill1DHist(h1d_kend_calo_el, kecalo);
+				Fill1DHist(h1d_kend_bb_el, kebb);
+
 			} //reco_el
 		}
 
