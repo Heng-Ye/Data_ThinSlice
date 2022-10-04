@@ -44,12 +44,13 @@
 #include <Math/Vector3D.h>
 #include <Fit/Fitter.h>
 
-#include "./cali/dedx_function_r5387.h"
+//#include "./cali/dedx_function_r5387.h"
 #include "./headers/BasicParameters.h"
 #include "./headers/BasicAnaFunc.h"
 #include "./headers/util.h"
 #include "./headers/ESliceParams.h"
 #include "./headers/ESlice.h"
+#include "./headers/BetheBloch.h"
 
 #include <cassert>
 
@@ -59,9 +60,38 @@ using namespace ROOT::Math;
 void ProtonESlice_run5387::Loop() {
 	if (fChain == 0) return;
 
-	//ThinSlice config. ---------------------------------------------------------------------------------------------------//
+	//ThinSlice config. --------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
         //SetOutputFileName(Form("data_run5387_prod4a_thinslice_dx%dcm_%dslcs.root", name_thinslicewidth, nthinslices)); //output file name
-        SetOutputFileName(Form("data_run5387_prod4a_eslice_dx%dcm_%dslcs_stid+0.5.root", name_thinslicewidth, nthinslices)); //output file name
+        //SetOutputFileName(Form("data_run5387_prod4a_eslice_dx%dcm_%dslcs_stid+0.5.root", name_thinslicewidth, nthinslices)); //output file name
+        SetOutputFileName(Form("/dune/data2/users/hyliao/protonana/v09_39_01/XS/prod4a_Eslice_dE%dMeV_%dslcs_beamxy_run%d_v09_39_01.root", name_thinslicewidth, nthinslices,5387)); //output file name
+
+	//Basic configure ------//
+	BetheBloch BB;
+	BB.SetPdgCode(2212);
+	//----------------------//
+	
+	//Fitted Data Beam Momentum ---------------//
+	double m1=1013.71; //Data prod4 reco2
+	double s1=68.6327; //Data prod4 reco2
+
+	//momentum cut range	
+	double mu_min=m1-3.*s1;
+	double mu_max=m1+3.*s1;
+
+
+        //const. E-loss assumption -----------------------------------------------//     
+        double const_eloss_data=45.6084/0.99943; //const E-loss from fit (calo)
+	//p[0]:45.6084; err_p[0]:0.296889; p[1]:-0.99943 err_p[1]:0.00617258
+        
+	//hy -------------------------------------------//
+	double Eloss_data_hy_stop=25.1911/1.00063;
+	double R_fit_hy=0.9994965057702763;
+	double er_R_fit_hy=0.04516809864770481;
+
+	//p[0]:25.1911
+	//err_p[0]:0.114666
+	//p[1]:-1.00063
+	//err_p[1]:0.00439028
 
         //book histograms --//
         BookHistograms();
@@ -233,8 +263,24 @@ void ProtonESlice_run5387::Loop() {
 		//if (IsCaloSize) Fill1DHist(reco_cosineTheta, cosine_beam_spec_primtrk);
 
                 //beam quality cut -----------------------------//
+		//beam info //
+		double bx=beamPosx->at(0);
+		double by=beamPosy->at(0);
+		double bz=beamPosz->at(0);
+		double p_beam=beamMomentum->at(0);
+		double ke_beam_MeV=1000.*p2ke(p_beam); //unit:MeV
+
+		//Beam XY cut
+		bool IsBeamXY=false;
+		if ((pow(((bx-meanX_data)/(1.5*rmsX_data)),2)+pow(((by-meanY_data)/(1.5*rmsY_data)),2))<=1.) IsBeamXY=true;
+
+		//beam-mom cut (within 3-sigma)
+		bool IsBeamMom=false;
+		if ((1000.*p_beam)>=mu_min&&(1000.*p_beam)<=mu_max) IsBeamMom=true;
+
+
                 bool IsBQ=false;
-                if (IsCosine&&IsPos) IsBQ=true;
+                if (IsBeamXY&&IsBeamMom&&IsCosine&&IsPos) IsBQ=true;
 		//if (IsBQ&&IsCaloSize&&IsPandoraSlice) n_bq++;
 		//if (IsPos&&IsCaloSize&&IsPandoraSlice) Fill1DHist(reco_cosineTheta_Pos, cosine_beam_spec_primtrk);
 
@@ -249,12 +295,12 @@ void ProtonESlice_run5387::Loop() {
                 double kereco_range2=0;
                 vector<double> EDept;
 		double pid=-99;
+                vector<double> trkdedx;
+                vector<double> trkres;
 
 		//Fill1DHist(trklen_reco_NoCut, range_reco);
 		double reco_calo_MeV=0;
                 if (IsCaloSize) { //if calo size not empty
-                        vector<double> trkdedx;
-                        vector<double> trkres;
                   	for (size_t h=0; h<primtrk_dedx->size(); ++h) { //loop over reco hits in a track
                         	double hitx_reco=primtrk_hitx->at(h);
                         	double hity_reco=primtrk_hity->at(h);
@@ -305,11 +351,11 @@ void ProtonESlice_run5387::Loop() {
 		//if (IsCaloSize) range_reco=primtrk_range->at(0); //unit:cm
 
 		//beam info ------------------------------------------------------------------------------------------------------------------------------------//
-		double bx=beamPosx->at(0);
-		double by=beamPosy->at(0);
-		double bz=beamPosz->at(0);
-		double p_beam=beamMomentum->at(0);
-		double ke_beam_MeV=1000.*p2ke(p_beam); //unit:MeV
+		//double bx=beamPosx->at(0);
+		//double by=beamPosy->at(0);
+		//double bz=beamPosz->at(0);
+		//double p_beam=beamMomentum->at(0);
+		//double ke_beam_MeV=1000.*p2ke(p_beam); //unit:MeV
 
 		double csda_val=csda_range_vs_mom_sm->Eval(p_beam); //expected csda value if proton stops; unit: cm
 		double ke_range_MeV=1000.*ke_vs_csda_range_sm->Eval(range_reco); //unit:MeV
@@ -342,10 +388,34 @@ void ProtonESlice_run5387::Loop() {
    		//p1          -1.00263e+00   1.67201e-02   1.67201e-02   1.66581e-08
 		//fit result ==========================================================//
 
+		//hypothetical length -------------------------------------------------------------------------------------//
+		double fitted_length=-1;
+                std::reverse(trkdedx.begin(),trkdedx.end());  
+		std::reverse(trkres.begin(),trkres.end()); 
+		double tmp_fitted_length=BB.Fit_dEdx_Residual_Length(trkdedx, trkres, 2212, false);
+		if (tmp_fitted_length>0) fitted_length=tmp_fitted_length;
+		double fitted_KE=-50; 
+		if (fitted_length>0) { 
+			fitted_KE=BB.KEFromRangeSpline(fitted_length);
+			//cout<<"event:"<<event<<" evttime:"<<evttime<<" fitted_KE:"<<endl;
+		}
+
+		//const E-loss asump ----------------------------------------
+		//double keffbeam=ke_beam_MeV-const_eloss_data;
+		double keffbeam=(ke_beam_MeV-Eloss_data_hy_stop)*R_fit_hy;
+		//double keffbeam=fitted_KE;
+
+		//ke at end point ---------------------------------------------------------------------//
+		//double kebb=-50; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
+		double kebb=-9999.; kebb=BB.KEAtLength(keffbeam, range_reco);
+		double kecalo=-9999.; kecalo=keffbeam-reco_calo_MeV;
+
 		//KE definition using const E-loss assumption -----------------------------------------------------------//
 		//double KEcalo_reco_constEcalo=-1; KEcalo_reco_constEcalo=ke_beam_MeV-mean_Elosscalo_stop-reco_calo_MeV;
-		double KEff_reco=ke_beam_MeV-mean_Elosscalo_stop;
-		double KEend_reco=KEff_reco-reco_calo_MeV;
+		//double KEff_reco=ke_beam_MeV-mean_Elosscalo_stop;
+		//double KEend_reco=KEff_reco-reco_calo_MeV;
+		double KEff_reco=keffbeam;
+		double KEend_reco=kebb;
 
 		//evt selection cuts
 		bool PassCuts_INT=false; //all bq cut+reco inel cut
