@@ -279,3 +279,119 @@ double ml_data_mc(vector<double> D /*data*/, vector<double> er_D, vector<double>
 
 	return 2.*ml;
 }
+
+double Convert_Proton_KE_Spectrometer_to_KE_ff(double KE_RecoBeam, TString key, int syst){
+	double out = KE_RecoBeam;
+	double delta_E = 0.;
+	double p0 = 0., p1 = 0., p2 = 0.;
+
+	if(key == "ElasTrue"){
+		if(syst == 0){
+			p0 = 39.78;
+			p1 = -0.2396;
+			p2 = 0.0004498;
+		}
+		else if(syst == -1){
+			p0 = 17.92;
+			p1 = -0.1334;
+			p2 = 0.0003075;
+		}
+		else if(syst == 1){
+			p0 = 60.52;
+			p1 = -0.3404;
+			p2 = 0.0005857;
+		}
+		else{
+			return out;
+		}
+	}
+	else if(key == "AllTrue"){
+		if(syst == 0){
+			p0 = 51.33;
+			p1 = -0.2954;
+			p2 = 0.0005164;
+		}
+		else if(syst == -1){
+			p0 = 28.91;
+			p1 = -0.1827;
+			p2 = 0.0003602;
+		}
+		else if(syst == 1){
+			p0 = 72.64;
+			p1 = -0.4028;
+			p2 = 0.0006661;
+		}
+		else{
+			return out;
+		}
+	}
+	else if(key == "ElasFitted"){
+		if(syst == 0){
+			p0 = 27.68;
+			p1 = -0.1727;
+			p2 = 0.0003779;
+		}
+		else if(syst == -1){
+			p0 = -6.135;
+			p1 = -0.01069;
+			p2 = 0.0001675;
+		}
+		else if(syst == 1){
+			p0 = 60.19;
+			p1 = -0.3284;
+			p2 = 0.0005808;
+		}
+		else{
+			return out;
+		}
+	}
+	else if(key == "AllFitted"){
+		if(syst == 0){
+			p0 = 37.57;
+			p1 = -0.2144;
+			p2 = 0.0004282;
+		}
+		else if(syst == -1){
+			p0 = 12.66;
+			p1 = -0.09451;
+			p2 = 0.0002699;
+		}
+		else if(syst == 1){
+			p0 = 61.69;
+			p1 = -0.3305;
+			p2 = 0.0005820;
+		}
+		else{
+			return out;
+		}
+	}
+	else if(key == "Data"){
+		if(syst == 0){
+			p0 = 47.35;
+			p1 = -0.1748;
+			p2 = 0.0003067;
+		}
+		else if(syst == -1){
+			p0 = 28.27;
+			p1 = -0.07865;
+			p2 = 0.0001744;
+		}
+		else if(syst == 1){
+			p0 = 65.99;
+			p1 = -0.2688;
+			p2 = 0.0004365;
+		}
+		else{
+			return out;
+		}
+	}
+	else {
+		return out;
+	}
+
+	delta_E = p0 + p1 * out + p2 * out * out;
+
+	return out - delta_E;
+
+}
+
