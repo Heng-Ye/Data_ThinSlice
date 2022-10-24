@@ -560,10 +560,11 @@ void ProtonMomentumReweight_run5387::Loop() {
 			//cout<<"event:"<<event<<" evttime:"<<evttime<<" fitted_KE:"<<endl;
 		}
 
-		//const E-loss asump ----------------------------------------
+		//const E-loss asump -----------------------------------------------------------
 		//double keffbeam=ke_beam_MeV-const_eloss_data;
 		//double keffbeam=(ke_beam_MeV-Eloss_data_hy_stop)*R_fit_hy;
-		double keffbeam=fitted_KE;
+		double keffbeam=Convert_Proton_KE_Spectrometer_to_KE_ff(ke_beam_MeV,"Data",0);
+		//double keffbeam=fitted_KE;
 
 		//ke at end point ---------------------------------------------------------------------//
 		//double kebb=-50; if (fitted_KE>0) kebb=BB.KEAtLength(fitted_KE, range_reco);
@@ -741,7 +742,9 @@ void ProtonMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=(KEbeam-dE)*R
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEFit/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEFit/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEffbeam/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEffbeam_Edept/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 		T0->Write();
