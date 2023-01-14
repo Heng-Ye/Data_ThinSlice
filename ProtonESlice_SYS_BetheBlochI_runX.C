@@ -64,7 +64,8 @@ void ProtonESlice_SYS_BetheBlochI_run5387::Loop() {
 	//ThinSlice config. --------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
         //SetOutputFileName(Form("data_run5387_prod4a_thinslice_dx%dcm_%dslcs.root", name_thinslicewidth, nthinslices)); //output file name
         //SetOutputFileName(Form("data_run5387_prod4a_eslice_dx%dcm_%dslcs_stid+0.5.root", name_thinslicewidth, nthinslices)); //output file name
-        SetOutputFileName(Form("/dune/data2/users/hyliao/protonana/v09_39_01/XS_BetheBlochI/prod4a_Eslice_BBI_dE%dMeV_%dslcs_beamxy_run%d_v09_39_01.root", name_thinslicewidth, nthinslices,5387)); //output file name
+        //SetOutputFileName(Form("/dune/data2/users/hyliao/protonana/v09_39_01/XS_BetheBlochI/prod4a_Eslice_BBI_dE%dMeV_%dslcs_beamxy_run%d_v09_39_01.root", name_thinslicewidth, nthinslices,5387)); //output file name
+        SetOutputFileName(Form("/dune/data2/users/hyliao/protonana/v09_39_01/XS_BetheBlochI_newslcid/prod4a_Eslice_BBI_dE%dMeV_%dslcs_beamxy_run%d_v09_39_01.root", name_thinslicewidth, nthinslices,5387)); //output file name
 
 	//Basic configure ----------//
 	//BetheBloch BB; //theory
@@ -426,14 +427,16 @@ void ProtonESlice_SYS_BetheBlochI_run5387::Loop() {
 
 			//SliceID definitions
 			//end
-			reco_sliceID = int((Emax-KEend_reco)/thinslicewidth);
+			//reco_sliceID = int((Emax-KEend_reco)/thinslicewidth);
+			reco_sliceID = int(floor((Emax-KEend_reco)/thinslicewidth));			
+
 			if (reco_sliceID < 0) reco_sliceID = -1;
 			if (reco_endz<0) reco_sliceID = -1;
 			if (reco_sliceID >= nthinslices) reco_sliceID = nthinslices;
 
 			//st
-			reco_st_sliceID=int((Emax-KEff_reco)/thinslicewidth+0.5);
-			//reco_st_sliceID=int(ceil((Emax-KEff_reco)/thinslicewidth));
+			//reco_st_sliceID=int((Emax-KEff_reco)/thinslicewidth+0.5);
+			reco_st_sliceID=int(ceil((Emax-KEff_reco)/thinslicewidth));
       			if (reco_st_sliceID<0) reco_st_sliceID=-1; //KE higher than Emax
 			if (reco_endz < 0) reco_st_sliceID = -1; 
 			if (reco_st_sliceID >= nthinslices) reco_st_sliceID = nthinslices;
