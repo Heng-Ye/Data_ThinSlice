@@ -166,10 +166,12 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	TH1D *h1d_keffbeam_stop=new TH1D("h1d_keffbeam_stop","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_keffbeam_el=new TH1D("h1d_keffbeam_el","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_keffbeam_inel=new TH1D("h1d_keffbeam_inel","",ny_edept,ymin_edept,ymax_edept);
+	TH1D *h1d_keffbeam_misidp=new TH1D("h1d_keffbeam_misidp","",ny_edept,ymin_edept,ymax_edept);
 	h1d_keffbeam->Sumw2();
 	h1d_keffbeam_stop->Sumw2();
 	h1d_keffbeam_el->Sumw2();
 	h1d_keffbeam_inel->Sumw2();
+	h1d_keffbeam_misidp->Sumw2();
 
 	TH1D *h1d_kehy=new TH1D("h1d_kehy","",ny_edept,ymin_edept,ymax_edept);
 	TH1D *h1d_kehy_stop=new TH1D("h1d_kehy_stop","",ny_edept,ymin_edept,ymax_edept);
@@ -195,17 +197,16 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	TH1D *h1d_kend_bb_stop=new TH1D("h1d_kend_bb_stop","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_bb_el=new TH1D("h1d_kend_bb_el","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_bb_inel=new TH1D("h1d_kend_bb_inel","", ny_edept, ymin_edept, ymax_edept);
+	TH1D *h1d_kend_bb_misidp=new TH1D("h1d_kend_bb_misidp","", ny_edept, ymin_edept, ymax_edept);
 	h1d_kend_bb_stop->Sumw2();
 	h1d_kend_bb_el->Sumw2();
 	h1d_kend_bb_inel->Sumw2();
+	h1d_kend_bb_misidp->Sumw2();
 
 	//Ratio plot -----------------------------------------------------------------------------------------------------------------//
 	TH2D *h2d_trklen_ratio_KEbbfit_KEffbeam_stop=new TH2D("h2d_trklen_ratio_KEbbfit_KEffbeam_stop","", 14000,0,140,4000,-20,20);
 	TH2D *h2d_trklen_ratio_KEbbfit_KEffbeam_el=new TH2D("h2d_trklen_ratio_KEbbfit_KEffbeam_el","", 14000,0,140,4000,-20,20);
 	TH2D *h2d_trklen_ratio_KEbbfit_KEffbeam_inel=new TH2D("h2d_trklen_ratio_KEbbfit_KEffbeam_inel","", 14000,0,140,4000,-20,20);
-
-
-
 
 	//mom
 	int nx=250;	
@@ -493,6 +494,11 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 			if (pid<=pid_2) IsRecoEl=true;
 		} //stopping p region
 
+		//MisID:P Cut ---------------------------------------------//
+		bool IsMisIDP=false;
+		if (IsPos&&cosine_beam_spec_primtrk<0.9) { IsMisIDP=true; }	
+
+
 		//XY Cut ---------------------------------------------------------------------------------------------------------------//
 		bool IsXY=false;
 		//start(x,y,z) without SCE corr. 
@@ -635,6 +641,14 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		if (IsPos&&IsCaloSize&&IsPandoraSlice) { //Pos
 			h1d_trklen_Pos->Fill(range_reco);
 		} //Pos
+
+
+		if (IsMisIDP&&IsBeamXY&&IsBeamMom&&IsPandoraSlice&&IsCaloSize) { //MisID:P
+			double mom_rw_minchi2=1.;
+			h1d_keffbeam_misidp->Fill(keffbeam, mom_rw_minchi2);
+			h1d_kend_bb_misidp->Fill(kebb, mom_rw_minchi2);
+		} //MisID:P
+
 
 
 		//if (IsBQ&&IsCaloSize&&IsPandoraSlice) {
@@ -801,6 +815,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		h1d_keffbeam_stop->Write();
 		h1d_keffbeam_el->Write();
 		h1d_keffbeam_inel->Write();
+		h1d_keffbeam_misidp->Write();
 
 		h1d_prange_stop->Write();
 		h1d_pcalo_stop->Write();
@@ -817,7 +832,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		h1d_kend_bb_stop->Write();
 		h1d_kend_bb_el->Write();
 		h1d_kend_bb_inel->Write();
-
+		h1d_kend_bb_misidp->Write();
 
 		h1d_kerange_stop->Write();
 		h1d_kecalo_stop->Write();
