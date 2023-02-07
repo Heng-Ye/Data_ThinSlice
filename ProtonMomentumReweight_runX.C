@@ -91,10 +91,10 @@ void ProtonMomentumReweight_run5387::Loop() {
 	BB.SetPdgCode(2212);
 	//----------------------//
 
-        //const. E-loss assumption -----------------------------------------------//     
-        double const_eloss_data=45.6084/0.99943; //const E-loss from fit (calo)
+	//const. E-loss assumption -----------------------------------------------//     
+	double const_eloss_data=45.6084/0.99943; //const E-loss from fit (calo)
 	//p[0]:45.6084; err_p[0]:0.296889; p[1]:-0.99943 err_p[1]:0.00617258
-        
+
 	//hy -------------------------------------------//
 	double Eloss_data_hy_stop=25.1911/1.00063;
 	double R_fit_hy=0.9994965057702763;
@@ -105,6 +105,29 @@ void ProtonMomentumReweight_run5387::Loop() {
 	//p[1]:-1.00063
 	//err_p[1]:0.00439028
 
+
+	//Energy-dependent E-loss upstream ------------------------------------------------------------------------------------------------------------------------------------------------------//
+	const int n_kebeam_slice=14; //14 energy slicing in total
+	int d_kebeam=50; //50 MeV Slice
+	int kebeam_min=0;
+	vector<int> KEbeam_slice;
+	KEbeam_slice.push_back(kebeam_min);
+
+	//per histogram
+	int n_edept=60;
+	double edept_min=-20;
+	double edept_max=100;
+
+	TH1D **diff_kebeam_kefit_stop=new TH1D*[n_kebeam_slice];
+	TH1D **diff_kebeam_kefit_el=new TH1D*[n_kebeam_slice];
+	for (int ii=0; ii<n_kebeam_slice; ++ii) {
+		diff_kebeam_kefit_stop[ii]=new TH1D(Form("diff_kebeam_kefit_stop_%d",ii),Form("#Delta(KE_{beam}-KE_{fit})=%d-%d MeV",kebeam_min,kebeam_min+d_kebeam),n_edept,edept_min,edept_max);
+		diff_kebeam_kefit_el[ii]=new TH1D(Form("diff_kebeam_kefit_el_%d",ii),Form("#Delta(KE_{beam}-KE_{fit})=%d-%d MeV",kebeam_min,kebeam_min+d_kebeam),n_edept,edept_min,edept_max);
+
+		kebeam_min+=d_kebeam;
+		KEbeam_slice.push_back(kebeam_min);
+	}
+	//---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//
 
 	//book histograms -------------------------------------------------------------------------//
 	//trklen
@@ -550,7 +573,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 
 		//hypothetical length -------------------------------------------------------------------------------------//
 		double fitted_length=-1;
-                std::reverse(trkdedx.begin(),trkdedx.end());  
+		std::reverse(trkdedx.begin(),trkdedx.end());  
 		std::reverse(trkres.begin(),trkres.end()); 
 		double tmp_fitted_length=BB.Fit_dEdx_Residual_Length(trkdedx, trkres, 2212, false);
 		if (tmp_fitted_length>0) fitted_length=tmp_fitted_length;
@@ -600,8 +623,35 @@ void ProtonMomentumReweight_run5387::Loop() {
 			Fill1DHist(h1d_kehy, fitted_KE);
 			Fill1DHist(h1d_phy, 1000.*ke2p(fitted_KE/1000.));
 			Fill1DHist(h1d_keffbeam, keffbeam);
-			
+
 			h1d_trklen_BQ->Fill(range_reco);
+
+
+			//E-dept Eloss --------------------------------------------------------------------------------------//
+			double diff_kebeam_kefit=ke_beam_MeV-fitted_KE;
+			for (int ii=0; ii<(int)KEbeam_slice.size()-1; ++ii) {
+				//kebeam: slicing range
+				double keslc_min=(double)KEbeam_slice.at(ii);
+				double keslc_max=(double)KEbeam_slice.at(ii+1);
+
+				if (ke_beam_MeV>=keslc_min&&ke_beam_MeV<keslc_max) {
+					if (IsRecoStop) { //reco stop 
+						diff_kebeam_kefit_stop[ii]->Fill(diff_kebeam_kefit);
+					} //reco stop
+					if (IsRecoEl) { //reco el
+						diff_kebeam_kefit_el[ii]->Fill(diff_kebeam_kefit);
+					} //reco el
+				}
+
+			}
+			//---------------------------------------------------------------------------------------------------//
+
+
+
+
+
+
+
 			if (IsXY) { 
 				h1d_trklen_XY->Fill(range_reco);
 				//h1d_zend_XY->Fill(zend_sce);
@@ -620,7 +670,7 @@ void ProtonMomentumReweight_run5387::Loop() {
 
 				//h1d_kebeam_stop->Fill(ke_beam_MeV);
 				//h1d_pbeam_stop->Fill(1000.*p_beam);
-				
+
 				Fill1DHist(h1d_kebeam_stop, ke_beam_MeV);
 				Fill1DHist(h1d_pbeam_stop, 1000.*p_beam);
 
@@ -744,7 +794,8 @@ void ProtonMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=(KEbeam-dE)*R
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEFit/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEffbeam/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEffbeam_Edept/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEffbeam_Edept/proton_beamxy_beammom_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/Diff_KEffbeam_KEFit/proton_beamxy_beammom_edept_eloss_run%d.root",run),"RECREATE"); //use KEff=KE(fit)
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 		T0->Write();
@@ -835,6 +886,11 @@ void ProtonMomentumReweight_run5387::Loop() {
 		h2d_time_pcalo_stop->Write();
 		h2d_time_prange_stop->Write();
 		h2d_time_pcaloOverprange_stop->Write();
+
+		for (int ii=0; ii<(int)KEbeam_slice.size(); ++ii) {
+			diff_kebeam_kefit_stop[ii]->Write();
+			diff_kebeam_kefit_el[ii]->Write();
+		}
 
 		fout->Close();
 
