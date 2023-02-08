@@ -104,6 +104,16 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	//err_p[0]:0.114666
 	//p[1]:-1.00063
 	//err_p[1]:0.00439028
+
+	//E-dept E-loss --------------------------------//
+	double p0_edept_stop=4.49549e+01;
+	double p1_edept_stop=-1.81374e-01;
+	double p2_edept_stop=3.14812e-04;
+	
+	double err_p0_edept_stop=1.38105e+01;
+	double err_p1_edept_stop=6.98549e-02;
+	double err_p1_edept_stop=8.73201e-05;
+
 	
        
 	//New weighting func (using KEff_fit_stop at TPC FF as a reference) ------//
@@ -621,10 +631,12 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 			//cout<<"event:"<<event<<" evttime:"<<evttime<<" fitted_KE:"<<endl;
 		}
 
-		//const E-loss asump -------------------------------------//
+		//const E-loss asump -------------------------------------------------------------------------------//
 		//double keffbeam=ke_beam_MeV-const_eloss_data;
 		double keffbeam=9999999;
-		keffbeam=(ke_beam_MeV-Eloss_data_hy_stop)*R_fit_hy;
+		//keffbeam=(ke_beam_MeV-Eloss_data_hy_stop)*R_fit_hy;
+		keffbeam=ke_beam_MeV-(p0_edept_stop+p1_edept_stop*ke_beam_MeV+p2_edept_stop*pow(ke_beam_MeV,2));
+		
 		double ratio_KEbbfit_KEffbeam=fitted_KE/keffbeam;
 
 		//ke at end point ---------------------------------------------------------------------//
@@ -785,7 +797,9 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		//TFile *fout = new TFile(Form("data_proton_beamxy_beammom_rmintersection_bmrw2.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_run%d.root",run),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_BMRW/proton_beamxy_beammom_bmrw_run%d.root",run),"RECREATE");
-		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_KEBEAMFF/proton_beamxy_beammom_run%d.root",run),"RECREATE");
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_KEBEAMFF/proton_beamxy_beammom_run%d.root",run),"RECREATE");
+		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEHY_KEBEAMFF_BKG/proton_beamxy_beammom_bkg_run%d.root",run),"RECREATE");
+		TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEFF_EDEPT/proton_beamxy_beammom_bkg_run%d.root",run),"RECREATE");
 		//TFile *fout = new TFile(Form("/dune/data2/users/hyliao/protonana/v09_39_01/KEstudy/proton_beamxy_beammom_All.root"),"RECREATE");
 		//TFile *fout = new TFile(Form("data_proton_bmrw2_usedefault_range_calc.root"),"RECREATE");
 		T0->Write();
