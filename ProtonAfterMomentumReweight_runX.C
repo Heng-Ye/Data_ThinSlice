@@ -106,6 +106,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	//err_p[1]:0.00439028
 
 	//E-dept E-loss --------------------------------//
+	//data
 	double p0_edept_stop=4.49549e+01;
 	double p1_edept_stop=-1.81374e-01;
 	double p2_edept_stop=3.14812e-04;
@@ -204,10 +205,12 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 	h1d_kend_calo_el->Sumw2();
 	h1d_kend_calo_inel->Sumw2();
 
+	TH1D *h1d_kend_bb=new TH1D("h1d_kend_bb","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_bb_stop=new TH1D("h1d_kend_bb_stop","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_bb_el=new TH1D("h1d_kend_bb_el","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_bb_inel=new TH1D("h1d_kend_bb_inel","", ny_edept, ymin_edept, ymax_edept);
 	TH1D *h1d_kend_bb_misidp=new TH1D("h1d_kend_bb_misidp","", ny_edept, ymin_edept, ymax_edept);
+	h1d_kend_bb->Sumw2();
 	h1d_kend_bb_stop->Sumw2();
 	h1d_kend_bb_el->Sumw2();
 	h1d_kend_bb_inel->Sumw2();
@@ -658,7 +661,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		if (IsMisIDP&&IsBeamXY&&IsBeamMom&&IsPandoraSlice&&IsCaloSize) { //MisID:P
 			double mom_rw_minchi2=1.;
 			h1d_keffbeam_misidp->Fill(keffbeam, mom_rw_minchi2);
-			h1d_kend_bb_misidp->Fill(kebb, mom_rw_minchi2);
+			Fill1DWHist(h1d_kend_bb_misidp, kebb, mom_rw_minchi2);
 		} //MisID:P
 
 
@@ -677,8 +680,9 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 			h1d_phy->Fill(1000.*ke2p(fitted_KE/1000.), mom_rw_minchi2);
 
 			h1d_keffbeam->Fill(keffbeam, mom_rw_minchi2);
-
 			h1d_trklen_BQ->Fill(range_reco, mom_rw_minchi2);
+			Fill1DWHist(h1d_kend_bb, kebb, mom_rw_minchi2);
+
 			if (IsXY) { 
 				h1d_trklen_XY->Fill(range_reco, mom_rw_minchi2);
 				//h1d_zend_XY->Fill(zend_sce);
@@ -711,7 +715,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 
 
 				h1d_kend_calo_stop->Fill(kecalo, mom_rw_minchi2);
-				h1d_kend_bb_stop->Fill(kebb, mom_rw_minchi2);
+				Fill1DWHist(h1d_kend_bb_stop, kebb, mom_rw_minchi2);
 
 
 				double tmp_prange=1000.*ke2p(ke_range);
@@ -744,7 +748,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 				h1d_keffbeam_inel->Fill(keffbeam, mom_rw_minchi2);
 
 				h1d_kend_calo_inel->Fill(kecalo, mom_rw_minchi2);
-				h1d_kend_bb_inel->Fill(kebb, mom_rw_minchi2);
+				Fill1DWHist(h1d_kend_bb_inel, kebb, mom_rw_minchi2);
 				h2d_trklen_ratio_KEbbfit_KEffbeam_inel->Fill(range_reco,ratio_KEbbfit_KEffbeam);
 
 			} //reco inel
@@ -753,7 +757,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 				h1d_keffbeam_el->Fill(keffbeam, mom_rw_minchi2);
 				h1d_kehy_el->Fill(fitted_KE, mom_rw_minchi2);
 				h1d_kend_calo_el->Fill(kecalo, mom_rw_minchi2);
-				h1d_kend_bb_el->Fill(kebb, mom_rw_minchi2);
+				Fill1DWHist(h1d_kend_bb_el, kebb, mom_rw_minchi2);
 				h2d_trklen_ratio_KEbbfit_KEffbeam_el->Fill(range_reco,ratio_KEbbfit_KEffbeam);
 			} //reco_el
 		}
@@ -843,6 +847,7 @@ void ProtonAfterMomentumReweight_run5387::Loop() {
 		h1d_kend_calo_el->Write();
 		h1d_kend_calo_inel->Write();
 
+		h1d_kend_bb->Write();
 		h1d_kend_bb_stop->Write();
 		h1d_kend_bb_el->Write();
 		h1d_kend_bb_inel->Write();
