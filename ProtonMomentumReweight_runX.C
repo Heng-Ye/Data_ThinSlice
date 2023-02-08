@@ -114,8 +114,8 @@ void ProtonMomentumReweight_run5387::Loop() {
 	KEbeam_slice.push_back(kebeam_min);
 
 	//per histogram
-	int n_edept=60;
-	double edept_min=-20;
+	int n_edept=75;
+	double edept_min=-50;
 	double edept_max=100;
 
 	TH1D **diff_kebeam_kefit_stop=new TH1D*[n_kebeam_slice];
