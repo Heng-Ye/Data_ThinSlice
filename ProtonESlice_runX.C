@@ -414,7 +414,7 @@ void ProtonESlice_run5387::Loop() {
 		//const E-loss asump ----------------------------------------
 		//double keffbeam=ke_beam_MeV-const_eloss_data;
 		//double keffbeam=(ke_beam_MeV-Eloss_data_hy_stop)*R_fit_hy;
-		keffbeam=ke_beam_MeV-(p0_edept_stop+p1_edept_stop*ke_beam_MeV+p2_edept_stop*pow(ke_beam_MeV,2));
+		double keffbeam=ke_beam_MeV-(p0_edept_stop+p1_edept_stop*ke_beam_MeV+p2_edept_stop*pow(ke_beam_MeV,2));
 
 		//double keffbeam=fitted_KE;
 
