@@ -64,7 +64,8 @@ void ProtonESlice_run5387::Loop() {
         //SetOutputFileName(Form("data_run5387_prod4a_thinslice_dx%dcm_%dslcs.root", name_thinslicewidth, nthinslices)); //output file name
         //SetOutputFileName(Form("data_run5387_prod4a_eslice_dx%dcm_%dslcs_stid+0.5.root", name_thinslicewidth, nthinslices)); //output file name
         //SetOutputFileName(Form("/dune/data2/users/hyliao/protonana/v09_39_01/XS/prod4a_Eslice_dE%dMeV_%dslcs_beamxy_run%d_v09_39_01.root", name_thinslicewidth, nthinslices,5387)); //output file name
-        SetOutputFileName(Form("/dune/data2/users/hyliao/protonana/v09_39_01/XS_newslcid/prod4a_Eslice_dE%dMeV_%dslcs_beamxy_run%d_v09_39_01_newslcid.root", name_thinslicewidth, nthinslices,5387)); //output file name
+        //SetOutputFileName(Form("/dune/data2/users/hyliao/protonana/v09_39_01/XS_newslcid/prod4a_Eslice_dE%dMeV_%dslcs_beamxy_run%d_v09_39_01_newslcid.root", name_thinslicewidth, nthinslices,5387)); //output file name
+        SetOutputFileName(Form("/dune/data2/users/hyliao/protonana/v09_39_01/XS_newslcid_Edept/prod4a_Eslice_dE%dMeV_%dslcs_beamxy_run%d_v09_39_01_newslcid_edept.root", name_thinslicewidth, nthinslices,5387)); //output file name
 
 	//Basic configure ------//
 	BetheBloch BB;
@@ -79,7 +80,6 @@ void ProtonESlice_run5387::Loop() {
 	double mu_min=m1-3.*s1;
 	double mu_max=m1+3.*s1;
 
-
         //const. E-loss assumption -----------------------------------------------//     
         double const_eloss_data=45.6084/0.99943; //const E-loss from fit (calo)
 	//p[0]:45.6084; err_p[0]:0.296889; p[1]:-0.99943 err_p[1]:0.00617258
@@ -93,6 +93,16 @@ void ProtonESlice_run5387::Loop() {
 	//err_p[0]:0.114666
 	//p[1]:-1.00063
 	//err_p[1]:0.00439028
+
+	//E-dept E-loss --------------------------------//
+	//data
+	double p0_edept_stop=4.49549e+01;
+	double p1_edept_stop=-1.81374e-01;
+	double p2_edept_stop=3.14812e-04;
+	
+	double err_p0_edept_stop=1.38105e+01;
+	double err_p1_edept_stop=6.98549e-02;
+	double err_p2_edept_stop=8.73201e-05;
 
         //book histograms --//
         BookHistograms();
@@ -403,7 +413,9 @@ void ProtonESlice_run5387::Loop() {
 
 		//const E-loss asump ----------------------------------------
 		//double keffbeam=ke_beam_MeV-const_eloss_data;
-		double keffbeam=(ke_beam_MeV-Eloss_data_hy_stop)*R_fit_hy;
+		//double keffbeam=(ke_beam_MeV-Eloss_data_hy_stop)*R_fit_hy;
+		keffbeam=ke_beam_MeV-(p0_edept_stop+p1_edept_stop*ke_beam_MeV+p2_edept_stop*pow(ke_beam_MeV,2));
+
 		//double keffbeam=fitted_KE;
 
 		//ke at end point ---------------------------------------------------------------------//
